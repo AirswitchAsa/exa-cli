@@ -20,5 +20,5 @@ through `#ConfigResolver` and calls the Exa API through `#ExaClient`.
 
 ## Notes
 
-- Scaffolded; not yet implemented
-- Maps to the Exa `/team/api-keys` endpoints
+- Implemented in `src/commands/key.ts`
+- Maps to the Exa Team Management API key endpoints
