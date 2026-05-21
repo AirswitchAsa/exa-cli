@@ -21,5 +21,5 @@ export, and import. Every subcommand resolves the API key through
 
 ## Notes
 
-- Scaffolded; not yet implemented
-- The largest endpoint group, mapping to the Exa `/websets` endpoints
+- Implemented in `src/commands/webset.ts`
+- The largest endpoint group, mapping to the Exa Websets endpoints
