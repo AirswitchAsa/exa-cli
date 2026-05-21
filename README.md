@@ -18,6 +18,8 @@ directly onto Exa's published [API reference](https://exa.ai/docs/reference).
 
 ## Install
 
+**CLI**
+
 ```bash
 npm install -g @spicadust/exa-cli
 ```
@@ -38,6 +40,15 @@ npm install && npm run build && npm link
 
 See the [user guide](docs/USER_GUIDE.md#distribution) for all distribution
 channels.
+
+**Agent skill** — for Claude Code and other coding agents:
+
+```bash
+npx skills install https://github.com/AirswitchAsa/exa-cli/tree/master/skills/exa
+```
+
+The skill bootstraps the `exa` executable itself — via `npx` or a prebuilt
+binary — so installing the CLI separately is optional.
 
 ## Quick start
 
