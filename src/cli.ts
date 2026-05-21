@@ -19,7 +19,13 @@ import { printError } from "./output.js";
 
 const program = new Command();
 
-program.name("exa").description("Command-line interface for the Exa search API.").version("0.0.1");
+program
+  .name("exa")
+  .description(
+    "Unofficial command-line interface for the Exa API. " +
+      "An independent project, not affiliated with or endorsed by Exa.",
+  )
+  .version("0.0.1");
 
 for (const command of [
   searchCommand,

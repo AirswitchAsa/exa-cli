@@ -3,6 +3,10 @@
 The complete command reference for `exa-cli`. For a project overview and a
 quick start, see the [README](../README.md).
 
+> **Unofficial project.** `exa-cli` is an independent, community-built tool. It
+> is not affiliated with, endorsed by, or maintained by Exa. It only consumes
+> the public Exa API.
+
 ## Contents
 
 - [Install](#install)

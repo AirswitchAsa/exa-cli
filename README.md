@@ -3,6 +3,11 @@
 A command-line interface for the [Exa](https://exa.ai) API — the search
 engine built for AI.
 
+> **Unofficial project.** `exa-cli` is an independent, community-built tool.
+> It is not affiliated with, endorsed by, or maintained by Exa. "Exa" is a
+> trademark of its respective owner; this project only consumes the public
+> Exa API.
+
 Exa has a broad, well-designed REST API but no official CLI. `exa-cli` covers
 that surface from the terminal, so every Exa capability — search, content
 extraction, answers, research, agents, monitors, and Websets — is available to

@@ -1,7 +1,7 @@
 {
   "name": "exa-cli",
   "version": "0.0.1",
-  "description": "A command-line interface for the Exa search API.",
+  "description": "Unofficial command-line interface for the Exa API. Not affiliated with Exa.",
   "type": "module",
   "bin": {
     "exa": "dist/cli.js"

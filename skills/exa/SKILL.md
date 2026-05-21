@@ -10,6 +10,9 @@ metadata:
 Run Exa-backed web search and content extraction through the `exa` CLI,
 instead of running the Exa MCP server.
 
+`exa-cli` is an unofficial, independent tool — not affiliated with, endorsed
+by, or maintained by Exa.
+
 > Status: the hand-written CLI covers Exa search, contents, answer, similar,
 > chat, context, responses, research, agent, monitors, websets, and team keys.
 
