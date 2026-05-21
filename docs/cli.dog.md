@@ -11,7 +11,7 @@ and sets a non-zero exit code.
 ## State
 
 - program: the root `commander` Command named `exa`
-- commands: the registered command groups — search, contents, answer, similar, research, agent, monitor, webset, key
+- commands: the registered command groups — search, contents, answer, similar, chat, context, response, research, agent, monitor, webset, key
 
 ## Events
 
@@ -22,4 +22,4 @@ and sets a non-zero exit code.
 
 - Source: `src/cli.ts`
 - Each command group lives in its own module under `src/commands/`
-- Unimplemented groups are registered as stub commands so `exa --help` shows the full surface
+- Every registered command group is implemented by a hand-written TypeScript module

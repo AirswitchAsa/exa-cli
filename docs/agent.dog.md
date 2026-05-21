@@ -7,11 +7,11 @@
 
 ## Description
 
-The `@User` manages asynchronous agent runs. `create` POSTs to `/agent`;
-`get` retrieves a run; `list` paginates runs; `cancel` stops a queued or
-running run; `delete` removes a stored run; `events` lists or replays the
-events emitted during a run. Every subcommand resolves the API key through
-`#ConfigResolver` and calls the Exa API through `#ExaClient`.
+The `@User` manages asynchronous agent runs. `create` POSTs to
+`/agent/runs`; `get` retrieves a run; `list` paginates runs; `cancel` stops
+a queued or running run; `delete` removes a stored run; `events` lists or
+replays the events emitted during a run. Every subcommand resolves the API
+key through `#ConfigResolver` and calls the Exa API through `#ExaClient`.
 
 ## Outcome
 

@@ -4,8 +4,9 @@
 
 A thin typed wrapper over `fetch` for the Exa REST API. Every command sends
 its request through this single component, which sets the base URL, attaches
-the API key header, serializes the JSON body, parses the response, and
-raises `&ExaError` on a non-2xx status.
+the API key header, serializes the JSON body, appends scalar and repeated
+query parameters, parses JSON responses, streams server-sent event bodies
+when requested, and raises `&ExaError` on a non-2xx status.
 
 ## State
 
@@ -21,5 +22,5 @@ raises `&ExaError` on a non-2xx status.
 ## Notes
 
 - Source: `src/client.ts`
-- Exposes `post`, `get`, `put`, and `delete` helpers over a generic `request` method
+- Exposes `post`, `get`, `patch`, `put`, `delete`, `stream`, and `postStream` helpers over generic request methods
 - Sends the API key in the `x-api-key` header

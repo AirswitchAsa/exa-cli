@@ -8,9 +8,10 @@
 ## Description
 
 The `@User` manages team API keys. Subcommands create a key, retrieve a
-key, list keys, update a key's name and rate limit, delete a key, and
-report usage analytics. Every subcommand resolves the calling API key
-through `#ConfigResolver` and calls the Exa API through `#ExaClient`.
+key, list keys, update a key's name, rate limit, and budget in cents, delete
+a key, and report usage analytics with date range and grouping query
+parameters. Every subcommand resolves the calling API key through
+`#ConfigResolver` and calls the Exa API through `#ExaClient`.
 
 ## Outcome
 
@@ -22,3 +23,4 @@ through `#ConfigResolver` and calls the Exa API through `#ExaClient`.
 
 - Implemented in `src/commands/key.ts`
 - Maps to the Exa Team Management API key endpoints
+- Uses API field names `budgetCents`, `start_date`, `end_date`, and `group_by`

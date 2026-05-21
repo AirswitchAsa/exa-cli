@@ -7,10 +7,12 @@ import {
   type JsonObject,
   mergeBodyJson,
   parseJsonObject,
+  printStream,
 } from "./_shared.js";
 
 interface AnswerOptions extends CommonOptions {
   text?: boolean;
+  stream?: boolean;
   outputSchema?: string;
   bodyJson?: string;
 }
@@ -45,6 +47,7 @@ export const answerCommand = new Command("answer")
   .description("Get an LLM answer to a question, informed by Exa search.")
   .argument("<question>", "question to answer")
   .option("--text", "include full text contents in cited search results")
+  .option("--stream", "stream partial answer chunks as server-sent events")
   .option("--output-schema <json>", "JSON schema for structured answer output")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
@@ -53,14 +56,22 @@ export const answerCommand = new Command("answer")
     const client = clientFor(options);
     const body: JsonObject = { query: question };
     addIfDefined(body, "text", options.text);
+    addIfDefined(body, "stream", options.stream);
     if (options.outputSchema !== undefined) {
       body.outputSchema = parseJsonObject(options.outputSchema, "--output-schema");
     }
 
-    const response = await client.post<AnswerResponse>(
-      "/answer",
-      mergeBodyJson(body, options.bodyJson),
-    );
+    const request = mergeBodyJson(body, options.bodyJson);
+
+    if (options.stream === true) {
+      const stream = await client.postStream("/answer", request, {
+        headers: { Accept: "text/event-stream" },
+      });
+      await printStream(stream);
+      return;
+    }
+
+    const response = await client.post<AnswerResponse>("/answer", request);
 
     if (options.json === true) {
       printJson(response);

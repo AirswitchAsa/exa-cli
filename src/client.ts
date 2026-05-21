@@ -1,6 +1,7 @@
 const DEFAULT_BASE_URL = "https://api.exa.ai";
 
-type QueryValue = boolean | number | string | undefined | null;
+type QueryScalar = boolean | number | string;
+type QueryValue = QueryScalar | QueryScalar[] | undefined | null;
 
 export interface RequestOptions {
   query?: Record<string, QueryValue>;
@@ -37,7 +38,12 @@ export class ExaClient {
     const url = new URL(`${this.#baseUrl}${path}`);
     if (query !== undefined) {
       for (const [key, value] of Object.entries(query)) {
-        if (value !== undefined && value !== null) {
+        if (value === undefined || value === null) continue;
+        if (Array.isArray(value)) {
+          for (const entry of value) {
+            url.searchParams.append(key, String(entry));
+          }
+        } else {
           url.searchParams.set(key, String(value));
         }
       }
@@ -104,8 +110,46 @@ export class ExaClient {
     return response.body;
   }
 
+  async requestStream(
+    method: string,
+    path: string,
+    body?: unknown,
+    options: RequestOptions = {},
+  ): Promise<ReadableStream<Uint8Array>> {
+    const response = await fetch(this.#url(path, options.query), {
+      method,
+      headers: this.#headers(options.headers, body !== undefined),
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const raw = await response.text();
+      let payload: unknown;
+      try {
+        payload = raw.length > 0 ? JSON.parse(raw) : undefined;
+      } catch {
+        payload = raw;
+      }
+      throw new ExaError(response.status, payload);
+    }
+
+    if (response.body === null) {
+      throw new Error("Exa API returned an empty stream.");
+    }
+
+    return response.body;
+  }
+
   post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>("POST", path, body, options);
+  }
+
+  postStream(
+    path: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<ReadableStream<Uint8Array>> {
+    return this.requestStream("POST", path, body, options);
   }
 
   get<T>(path: string, options?: RequestOptions): Promise<T> {

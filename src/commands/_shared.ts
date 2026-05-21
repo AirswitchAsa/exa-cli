@@ -29,6 +29,12 @@ export function parseNumber(value: string): number {
   return parsed;
 }
 
+export function parseBoolean(value: string): boolean {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw new Error(`Expected "true" or "false", received "${value}".`);
+}
+
 export function splitList(value: string): string[] {
   return value
     .split(",")
@@ -65,7 +71,7 @@ export function mergeBodyJson(body: JsonObject, bodyJson?: string): JsonObject {
 }
 
 export async function readStdinLines(): Promise<string[]> {
-  if (process.stdin.isTTY) return [];
+  if (process.stdin.isTTY !== false) return [];
 
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) {

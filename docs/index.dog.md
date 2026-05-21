@@ -12,10 +12,13 @@ Project index for Exa CLI.
 
 - [Agent](agent.dog.md)
 - [Answer](answer.dog.md)
+- [Chat](chat.dog.md)
 - [Contents](contents.dog.md)
+- [Context](context.dog.md)
 - [Keys](keys.dog.md)
 - [Monitor](monitor.dog.md)
 - [Research](research.dog.md)
+- [Response](response.dog.md)
 - [Search](search.dog.md)
 - [Similar](similar.dog.md)
 - [Webset](webset.dog.md)

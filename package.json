@@ -16,8 +16,9 @@
     "build": "tsc && chmod +x dist/cli.js",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
+    "test": "node --import tsx --test --test-concurrency=1 tests/**/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check src",
+    "lint": "biome check src tests",
     "format": "biome format --write src",
     "prepublishOnly": "npm run build"
   },

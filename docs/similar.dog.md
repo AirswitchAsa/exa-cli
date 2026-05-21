@@ -10,6 +10,8 @@
 The `@User` runs `exa similar` with a source URL. The `#CLI` resolves the
 API key through `#ConfigResolver` and uses `#ExaClient` to POST to the Exa
 `/findSimilar` endpoint, which returns pages related to the source URL.
+Domain filters, crawl and published date filters, moderation, content text,
+and `--body-json` are available for request shaping.
 
 ## Outcome
 

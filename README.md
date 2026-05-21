@@ -9,9 +9,9 @@ without running an MCP server.
 
 ## Status
 
-Work in progress. `exa search` is implemented end to end; the remaining
-command groups are scaffolded and registered (visible in `exa --help`) but
-not yet implemented. See [Commands](#commands) for the full intended surface.
+Implemented end to end with hand-written TypeScript commands for the Exa REST
+API surface, plus unit tests for the client, credential resolution, and command
+request mappings. See [Commands](#commands) for the covered surface.
 
 ## Install
 
@@ -25,7 +25,8 @@ Requires Node.js 20 or newer.
 
 ## Authentication
 
-The CLI reads `EXA_API_KEY` from the environment, or accepts `--api-key`.
+The CLI resolves credentials in this order: `--api-key`, `EXA_API_KEY` from
+the environment, then `EXA_API_KEY` in a current-directory `.env` file.
 
 ```bash
 export EXA_API_KEY=...   # get a key at https://exa.ai
@@ -36,6 +37,8 @@ export EXA_API_KEY=...   # get a key at https://exa.ai
 ```bash
 exa search "embeddings-based retrieval" --num-results 5
 exa search "exa api" --text --json
+exa answer "What changed in Exa's API recently?" --json
+exa research create "Compare Exa Websets and Monitors" --wait --json
 ```
 
 ## Commands
@@ -48,10 +51,13 @@ Target coverage is the full Exa REST API:
 | `contents` | fetch clean page contents for URLs                              |
 | `answer`   | get an LLM answer informed by Exa search                        |
 | `similar`  | find pages similar to a URL                                     |
+| `chat`     | OpenAI-compatible chat completions                              |
+| `context`  | LLM-ready context generation                                    |
+| `response` | `create` · `get`                                                |
 | `research` | `create` · `get` · `list`                                       |
 | `agent`    | `create` · `get` · `list` · `cancel` · `delete` · `events`      |
-| `monitor`  | `create` · `get` · `list` · `update` · `delete` · `trigger` · `runs` |
-| `webset`   | `create` · `get` · `list` · `update` · `delete` · `cancel` · `preview` · `search` · `items` · `enrich` · `export` · `import` |
+| `monitor`  | `create` · `get` · `list` · `update` · `delete` · `trigger` · `runs` · `batch` |
+| `webset`   | `create` · `get` · `list` · `update` · `delete` · `cancel` · `preview` · `search` · `items` · `enrich` · `export` · `import` · `webhook` · `events` · `monitor` · `team` |
 | `key`      | `create` · `get` · `list` · `update` · `delete` · `usage`       |
 
 ## Design reference
@@ -66,6 +72,7 @@ source of truth for actors, behaviors, components, and data. Start from
 
 ```bash
 npm run dev -- search "query"   # run from source with tsx
+npm run test
 npm run typecheck
 npm run lint
 ```

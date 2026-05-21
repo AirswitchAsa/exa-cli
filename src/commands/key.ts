@@ -15,27 +15,33 @@ const TEAM_BASE_URL = "https://admin-api.exa.ai/team-management";
 interface KeyCreateOptions extends CommonOptions {
   name?: string;
   rateLimit?: number;
-  budget?: number;
+  budgetCents?: number;
   bodyJson?: string;
 }
 
 interface KeyUpdateOptions extends CommonOptions {
   name?: string;
   rateLimit?: number;
-  budget?: number;
+  budgetCents?: number;
+  clearBudget?: boolean;
   bodyJson?: string;
 }
 
 interface KeyUsageOptions extends CommonOptions {
   startDate?: string;
   endDate?: string;
+  groupBy?: string;
 }
 
 function bodyFrom(options: KeyCreateOptions | KeyUpdateOptions): JsonObject {
   const body: JsonObject = {};
   addIfDefined(body, "name", options.name);
   addIfDefined(body, "rateLimit", options.rateLimit);
-  addIfDefined(body, "budget", options.budget);
+  if ("clearBudget" in options && options.clearBudget === true) {
+    body.budgetCents = null;
+  } else {
+    addIfDefined(body, "budgetCents", options.budgetCents);
+  }
   return mergeBodyJson(body, options.bodyJson);
 }
 
@@ -46,7 +52,7 @@ keyCommand
   .description("Create an API key.")
   .option("--name <name>", "API key name")
   .option("--rate-limit <limit>", "request rate limit", parseInteger)
-  .option("--budget <amount>", "budget for the key", Number)
+  .option("--budget-cents <cents>", "spending budget for the key, in cents", parseInteger)
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
@@ -85,7 +91,8 @@ keyCommand
   .argument("<id>", "API key ID")
   .option("--name <name>", "API key name")
   .option("--rate-limit <limit>", "request rate limit", parseInteger)
-  .option("--budget <amount>", "budget for the key", Number)
+  .option("--budget-cents <cents>", "spending budget for the key, in cents", parseInteger)
+  .option("--clear-budget", "remove the spending budget")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
@@ -113,12 +120,17 @@ keyCommand
   .argument("<id>", "API key ID")
   .option("--start-date <date>", "usage start date")
   .option("--end-date <date>", "usage end date")
+  .option("--group-by <unit>", "usage granularity: hour, day, month")
   .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: KeyUsageOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);
     const response = await client.get<unknown>(`/api-keys/${encodePath(id)}/usage`, {
-      query: { startDate: options.startDate, endDate: options.endDate },
+      query: {
+        start_date: options.startDate,
+        end_date: options.endDate,
+        group_by: options.groupBy,
+      },
     });
     printMaybeJson(response, options.json);
   });

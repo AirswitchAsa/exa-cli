@@ -8,8 +8,8 @@
 ## Description
 
 The `@User` manages asynchronous research tasks. `exa research create`
-POSTs to `/research` and returns a task id. `exa research get <id>` polls
-`/research/{id}` for status and results. `exa research list` retrieves a
+POSTs to `/research/v1` and returns a task id. `exa research get <id>` polls
+`/research/v1/{id}` for status and results. `exa research list` retrieves a
 paginated task history. Every subcommand resolves the API key through
 `#ConfigResolver` and calls the Exa API through `#ExaClient`.
 

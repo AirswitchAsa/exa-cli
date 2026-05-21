@@ -3,10 +3,13 @@ import { Command } from "commander";
 import { ExaError } from "./client.js";
 import { agentCommand } from "./commands/agent.js";
 import { answerCommand } from "./commands/answer.js";
+import { chatCommand } from "./commands/chat.js";
 import { contentsCommand } from "./commands/contents.js";
+import { contextCommand } from "./commands/context.js";
 import { keyCommand } from "./commands/key.js";
 import { monitorCommand } from "./commands/monitor.js";
 import { researchCommand } from "./commands/research.js";
+import { responseCommand } from "./commands/response.js";
 import { searchCommand } from "./commands/search.js";
 import { similarCommand } from "./commands/similar.js";
 import { websetCommand } from "./commands/webset.js";
@@ -21,6 +24,9 @@ for (const command of [
   contentsCommand,
   answerCommand,
   similarCommand,
+  chatCommand,
+  contextCommand,
+  responseCommand,
   researchCommand,
   agentCommand,
   monitorCommand,

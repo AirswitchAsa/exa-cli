@@ -16,10 +16,11 @@ search results, together with the citations it relied on.
 
 - The answer text on stdout, with citations listed by `#OutputWriter`
 - Raw JSON response on stdout when `--json` is passed
+- Server-sent event chunks on stdout when `--stream` is passed
 - On API failure an `&ExaError` is reported on stderr with exit code 1
 
 ## Notes
 
 - Implemented in `src/commands/answer.ts`
-- Supports `--text`, `--output-schema`, `--api-key`, `--json`, and
+- Supports `--text`, `--stream`, `--output-schema`, `--api-key`, `--json`, and
   `--body-json` for advanced request fields

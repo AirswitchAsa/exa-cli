@@ -8,11 +8,13 @@ import {
   getString,
   type JsonObject,
   mergeBodyJson,
+  parseBoolean,
   parseInteger,
   parseJson,
   parseJsonObject,
   pollUntilTerminal,
   printMaybeJson,
+  splitList,
 } from "./_shared.js";
 
 const WEBSETS_BASE_URL = "https://api.exa.ai/websets";
@@ -100,6 +102,38 @@ interface ExportOptions extends CommonOptions {
   bodyJson?: string;
 }
 
+interface WebhookOptions extends CommonOptions {
+  url?: string;
+  events?: string;
+  metadata?: string;
+  clearMetadata?: boolean;
+  bodyJson?: string;
+}
+
+interface EventListOptions extends CommonOptions {
+  cursor?: string;
+  limit?: number;
+  types?: string;
+  createdBefore?: string;
+  createdAfter?: string;
+}
+
+interface WebhookAttemptOptions extends CommonOptions {
+  cursor?: string;
+  limit?: number;
+  eventType?: string;
+  successful?: boolean;
+}
+
+interface WebsetMonitorOptions extends CommonOptions {
+  websetId?: string;
+  cron?: string;
+  timezone?: string;
+  behavior?: string;
+  metadata?: string;
+  bodyJson?: string;
+}
+
 function collect(value: string, previous: string[] = []): string[] {
   previous.push(value);
   return previous;
@@ -166,6 +200,36 @@ function enrichmentBody(options: EnrichmentOptions): JsonObject {
   if (options.clearMetadata === true) {
     body.metadata = null;
   } else if (options.metadata !== undefined) {
+    body.metadata = parseJsonObject(options.metadata, "--metadata");
+  }
+  return mergeBodyJson(body, options.bodyJson);
+}
+
+function webhookBody(options: WebhookOptions): JsonObject {
+  const body: JsonObject = {};
+  addIfDefined(body, "url", options.url);
+  if (options.events !== undefined) body.events = splitList(options.events);
+  if (options.clearMetadata === true) {
+    body.metadata = null;
+  } else if (options.metadata !== undefined) {
+    body.metadata = parseJsonObject(options.metadata, "--metadata");
+  }
+  return mergeBodyJson(body, options.bodyJson);
+}
+
+function websetMonitorBody(options: WebsetMonitorOptions): JsonObject {
+  const body: JsonObject = {};
+  addIfDefined(body, "websetId", options.websetId);
+  if (options.cron !== undefined || options.timezone !== undefined) {
+    body.cadence = {
+      ...(options.cron !== undefined ? { cron: options.cron } : {}),
+      ...(options.timezone !== undefined ? { timezone: options.timezone } : {}),
+    };
+  }
+  if (options.behavior !== undefined) {
+    body.behavior = parseJsonObject(options.behavior, "--behavior");
+  }
+  if (options.metadata !== undefined) {
     body.metadata = parseJsonObject(options.metadata, "--metadata");
   }
   return mergeBodyJson(body, options.bodyJson);
@@ -597,6 +661,259 @@ importCommand
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
     const response = await client.delete<unknown>(`/v0/imports/${encodePath(id)}`);
+    printMaybeJson(response, options.json);
+  });
+
+const webhookCommand = websetCommand.command("webhook").description("Manage Websets webhooks.");
+
+webhookCommand
+  .command("create")
+  .description("Create a webhook.")
+  .option("--url <url>", "webhook destination URL")
+  .option("--events <events>", "comma-separated event types")
+  .option("--metadata <json>", "metadata object")
+  .option("--body-json <json>", "merge raw JSON request fields")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (options: WebhookOptions) => {
+    const client = websetClient(options);
+    const response = await client.post<unknown>("/v0/webhooks", webhookBody(options));
+    printMaybeJson(response, options.json);
+  });
+
+webhookCommand
+  .command("list")
+  .description("List webhooks.")
+  .option("--cursor <cursor>", "pagination cursor")
+  .option("--limit <count>", "number of webhooks to return", parseInteger)
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (options: PageOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>("/v0/webhooks", {
+      query: { cursor: options.cursor, limit: options.limit },
+    });
+    printMaybeJson(response, options.json, true);
+  });
+
+webhookCommand
+  .command("get")
+  .description("Retrieve a webhook.")
+  .argument("<id>", "webhook ID")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: CommonOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>(`/v0/webhooks/${encodePath(id)}`);
+    printMaybeJson(response, options.json);
+  });
+
+webhookCommand
+  .command("update")
+  .description("Update a webhook.")
+  .argument("<id>", "webhook ID")
+  .option("--url <url>", "webhook destination URL")
+  .option("--events <events>", "comma-separated event types")
+  .option("--metadata <json>", "metadata object")
+  .option("--clear-metadata", "remove metadata")
+  .option("--body-json <json>", "merge raw JSON request fields")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: WebhookOptions) => {
+    const client = websetClient(options);
+    const response = await client.patch<unknown>(
+      `/v0/webhooks/${encodePath(id)}`,
+      webhookBody(options),
+    );
+    printMaybeJson(response, options.json);
+  });
+
+webhookCommand
+  .command("delete")
+  .description("Delete a webhook.")
+  .argument("<id>", "webhook ID")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: CommonOptions) => {
+    const client = websetClient(options);
+    const response = await client.delete<unknown>(`/v0/webhooks/${encodePath(id)}`);
+    printMaybeJson(response, options.json);
+  });
+
+webhookCommand
+  .command("attempts")
+  .description("List webhook delivery attempts.")
+  .argument("<id>", "webhook ID")
+  .option("--cursor <cursor>", "pagination cursor")
+  .option("--limit <count>", "number of attempts to return", parseInteger)
+  .option("--event-type <type>", "event type filter")
+  .option("--successful <true|false>", "filter by delivery success", parseBoolean)
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: WebhookAttemptOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>(`/v0/webhooks/${encodePath(id)}/attempts`, {
+      query: {
+        cursor: options.cursor,
+        limit: options.limit,
+        eventType: options.eventType,
+        successful: options.successful,
+      },
+    });
+    printMaybeJson(response, options.json, true);
+  });
+
+const eventsCommand = websetCommand
+  .command("events")
+  .description("List and retrieve Websets events.");
+
+eventsCommand
+  .command("list")
+  .description("List events.")
+  .option("--cursor <cursor>", "pagination cursor")
+  .option("--limit <count>", "number of events to return", parseInteger)
+  .option("--types <types>", "comma-separated event types")
+  .option("--created-before <date>", "only events created before this ISO datetime")
+  .option("--created-after <date>", "only events created after this ISO datetime")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (options: EventListOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>("/v0/events", {
+      query: {
+        cursor: options.cursor,
+        limit: options.limit,
+        types: options.types === undefined ? undefined : splitList(options.types),
+        createdBefore: options.createdBefore,
+        createdAfter: options.createdAfter,
+      },
+    });
+    printMaybeJson(response, options.json, true);
+  });
+
+eventsCommand
+  .command("get")
+  .description("Retrieve an event.")
+  .argument("<id>", "event ID")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: CommonOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>(`/v0/events/${encodePath(id)}`);
+    printMaybeJson(response, options.json);
+  });
+
+const websetMonitorCommand = websetCommand
+  .command("monitor")
+  .description("Manage monitors that keep websets fresh.");
+
+websetMonitorCommand
+  .command("create")
+  .description("Create a webset monitor.")
+  .option("--webset-id <id>", "webset ID to monitor")
+  .option("--cron <expr>", "cron schedule expression")
+  .option("--timezone <tz>", "IANA timezone for the schedule")
+  .option("--behavior <json>", "monitor behavior JSON object")
+  .option("--metadata <json>", "metadata object")
+  .option("--body-json <json>", "merge raw JSON request fields")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (options: WebsetMonitorOptions) => {
+    const client = websetClient(options);
+    const response = await client.post<unknown>("/v0/monitors", websetMonitorBody(options));
+    printMaybeJson(response, options.json);
+  });
+
+websetMonitorCommand
+  .command("list")
+  .description("List webset monitors.")
+  .option("--cursor <cursor>", "pagination cursor")
+  .option("--limit <count>", "number of monitors to return", parseInteger)
+  .option("--webset-id <id>", "webset ID filter")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (options: PageOptions & { websetId?: string }) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>("/v0/monitors", {
+      query: {
+        cursor: options.cursor,
+        limit: options.limit,
+        websetId: options.websetId,
+      },
+    });
+    printMaybeJson(response, options.json, true);
+  });
+
+websetMonitorCommand
+  .command("get")
+  .description("Retrieve a webset monitor.")
+  .argument("<id>", "monitor ID")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: CommonOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>(`/v0/monitors/${encodePath(id)}`);
+    printMaybeJson(response, options.json);
+  });
+
+websetMonitorCommand
+  .command("update")
+  .description("Update a webset monitor.")
+  .argument("<id>", "monitor ID")
+  .option("--webset-id <id>", "webset ID to monitor")
+  .option("--cron <expr>", "cron schedule expression")
+  .option("--timezone <tz>", "IANA timezone for the schedule")
+  .option("--behavior <json>", "monitor behavior JSON object")
+  .option("--metadata <json>", "metadata object")
+  .option("--body-json <json>", "merge raw JSON request fields")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: WebsetMonitorOptions) => {
+    const client = websetClient(options);
+    const response = await client.patch<unknown>(
+      `/v0/monitors/${encodePath(id)}`,
+      websetMonitorBody(options),
+    );
+    printMaybeJson(response, options.json);
+  });
+
+websetMonitorCommand
+  .command("delete")
+  .description("Delete a webset monitor.")
+  .argument("<id>", "monitor ID")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (id: string, options: CommonOptions) => {
+    const client = websetClient(options);
+    const response = await client.delete<unknown>(`/v0/monitors/${encodePath(id)}`);
+    printMaybeJson(response, options.json);
+  });
+
+websetMonitorCommand
+  .command("runs")
+  .description("List monitor runs, or retrieve a run when run ID is provided.")
+  .argument("<monitor>", "monitor ID")
+  .argument("[id]", "run ID")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (monitor: string, id: string | undefined, options: CommonOptions) => {
+    const client = websetClient(options);
+    const path =
+      id === undefined
+        ? `/v0/monitors/${encodePath(monitor)}/runs`
+        : `/v0/monitors/${encodePath(monitor)}/runs/${encodePath(id)}`;
+    const response = await client.get<unknown>(path);
+    printMaybeJson(response, options.json, id === undefined);
+  });
+
+websetCommand
+  .command("team")
+  .description("Show the authenticated Websets team.")
+  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
+  .option("--json", "print the raw JSON response")
+  .action(async (options: CommonOptions) => {
+    const client = websetClient(options);
+    const response = await client.get<unknown>("/v0/teams/me");
     printMaybeJson(response, options.json);
   });
 

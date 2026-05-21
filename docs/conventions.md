@@ -16,17 +16,20 @@ REST API so the CLI surface is predictable from the API reference.
 
 - Result content and JSON are written to **stdout**; diagnostics, progress,
   and errors are written to **stderr**. This keeps commands pipeable.
-- Every command accepts `--json` for the raw API response. Without it, the
+- Every non-streaming command accepts `--json` for the raw API response. Without it, the
   command prints a human-readable rendering.
+- Commands backed by server-sent event endpoints accept `--stream` or
+  `--follow` and write the event stream directly to stdout.
 - All output goes through the `OutputWriter` component so the stdout/stderr
   split is enforced in one place.
 
 ## Authentication
 
 The Exa API key is resolved by the `ConfigResolver` component: an explicit
-`--api-key` flag wins, otherwise `EXA_API_KEY` from the environment. A
-missing key is a usage error with a remediation message — it is not an API
-error. The key value is never echoed back to output.
+`--api-key` flag wins, then `EXA_API_KEY` from the environment, then an
+`EXA_API_KEY` entry in the current working directory's `.env` file. A missing
+key is a usage error with a remediation message — it is not an API error. The
+key value is never echoed back to output.
 
 ## Asynchronous commands
 
