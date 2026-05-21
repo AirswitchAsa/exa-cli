@@ -1,39 +1,175 @@
 name: release
 
-# Tag a release with `git tag vX.Y.Z && git push --tags`.
-# Requires an NPM_TOKEN repository secret for the npm publish step.
+# Publishes the npm package and attaches a standalone binary per platform to
+# the GitHub release. Pushing a version tag (`git tag v0.1.0 && git push
+# --tags`) runs the full release. A manual run builds binaries and creates the
+# release only — tick `publish_npm` to also publish to npm.
+#
+# Authentication: npm Trusted Publishing (OIDC) — no NPM_TOKEN secret. The
+# `npm` job mints a short-lived OIDC token via `id-token: write` and npm
+# verifies it against the trusted publisher configured for the package.
+#
+# Gating, in layers:
+#   1. `authorize` hard-fails unless the actor is the repo owner; every other
+#      job depends on it.
+#   2. Tag pushes and workflow_dispatch already require repo write access.
+#   3. The `npm` job runs in the `release` GitHub Environment — add a required
+#      reviewer to that environment for a manual approval gate.
+#
+# One-time setup (the package must exist before a trusted publisher can be
+# configured, so the FIRST publish is manual):
+#   a. Locally: `npm login` then `npm publish` once.
+#   b. npmjs.com -> the package -> Settings -> Trusted Publisher -> GitHub
+#      Actions. Org: AirswitchAsa, Repo: exa-cli, Workflow: release.yml,
+#      Environment: release.
+#   c. GitHub repo -> Settings -> Environments -> create `release` (optionally
+#      add yourself as a required reviewer).
+# Every tagged release after that publishes through this workflow.
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v0.1.0). Created if it does not exist."
+        required: true
+        type: string
+      publish_npm:
+        description: "Also publish to npm. Leave off for a binary-only (re)build."
+        type: boolean
+        default: false
   push:
-    tags: ["v*"]
+    tags:
+      - "v*"
 
-permissions:
-  contents: write
+# No ambient permissions; each job is granted only what it needs.
+permissions: {}
 
 jobs:
-  npm:
+  authorize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Restrict to repo owner
+        env:
+          ACTOR: ${{ github.actor }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "$ACTOR" != "$OWNER" ]; then
+            echo "::error::Release workflow is restricted to the repo owner ($OWNER); actor was $ACTOR"
+            exit 1
+          fi
+
+  npm:
+    name: Publish to npm
+    needs: authorize
+    # Tag pushes always publish; manual runs only when publish_npm is ticked.
+    if: github.event_name == 'push' || inputs.publish_npm
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write # mint the OIDC token for npm trusted publishing
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org
+      - name: Use a trusted-publishing-capable npm
+        run: npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
       - run: npm ci
-      # `npm publish` runs prepublishOnly: lint, typecheck, unit tests, build.
+      # No NODE_AUTH_TOKEN: npm authenticates via OIDC. `npm publish` runs
+      # prepublishOnly (lint, typecheck, test, build) and, because the repo and
+      # package are public, auto-generates provenance attestations.
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   binaries:
-    runs-on: ubuntu-latest
+    name: Build ${{ matrix.target }}
+    needs: authorize
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: exa-darwin-arm64
+            runner: macos-14
+            ext: ""
+          - target: exa-darwin-x64
+            runner: macos-13
+            ext: ""
+          - target: exa-linux-x64
+            runner: ubuntu-22.04
+            ext: ""
+          - target: exa-linux-arm64
+            runner: ubuntu-22.04-arm
+            ext: ""
+          - target: exa-windows-x64
+            runner: windows-latest
+            ext: ".exe"
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
       - uses: oven-sh/setup-bun@v2
+
       - run: bun install
-      # Bun cross-compiles every target from one Linux host.
-      - run: npm run build:bun:all
-      - name: Publish binaries to the GitHub release
+
+      - name: Build standalone binary
+        shell: bash
+        run: bun build src/cli.ts --compile --outfile "dist-bin/exa${{ matrix.ext }}"
+
+      - name: Smoke test
+        shell: bash
+        run: "dist-bin/exa${{ matrix.ext }} --help"
+
+      - name: Stage asset
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cp "dist-bin/exa${{ matrix.ext }}" "artifacts/${{ matrix.target }}${{ matrix.ext }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.target }}
+          path: artifacts/${{ matrix.target }}${{ matrix.ext }}
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [authorize, binaries]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create and upload to the GitHub release
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$GITHUB_REF_NAME" dist-bin/exa-* --title "$GITHUB_REF_NAME" --generate-notes
+          TAG: ${{ steps.tag.outputs.name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --generate-notes \
+              --target "${GITHUB_SHA}"
+          fi
+          gh release upload "$TAG" artifacts/* --clobber

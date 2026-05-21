@@ -5,6 +5,10 @@ on:
     branches: [master]
   pull_request:
 
+# Read-only: CI lints, type-checks, builds, and tests — it never publishes.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest

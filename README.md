@@ -11,25 +11,33 @@ engine built for AI.
 Exa has a broad, well-designed REST API but no official CLI. `exa-cli` covers
 that surface from the terminal, so every Exa capability — search, content
 extraction, answers, research, agents, monitors, and Websets — is available to
-shell scripts and agent harnesses without running an MCP server.
+shell scripts and agent harnesses without the MCP server.
 
-It is hand-written TypeScript, one command module per API area, mapped
+The project is written TypeScript, one command module per API area, mapped
 directly onto Exa's published [API reference](https://exa.ai/docs/reference).
 
 ## Install
 
 ```bash
-npm install -g exa-cli
+npm install -g @spicadust/exa-cli
 ```
 
-Or build from source (Node.js 20+):
+No npm? Install a standalone binary — no Node.js runtime required (macOS / Linux):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AirswitchAsa/exa-cli/master/scripts/install.sh | sh
+```
+
+Windows binaries and every other platform are on the
+[releases page](https://github.com/AirswitchAsa/exa-cli/releases/latest). Or
+build from source (Node.js 20+):
 
 ```bash
 npm install && npm run build && npm link
 ```
 
-A standalone binary that needs no Node.js runtime is also available via Bun —
-see the [user guide](docs/USER_GUIDE.md#distribution).
+See the [user guide](docs/USER_GUIDE.md#distribution) for all distribution
+channels.
 
 ## Quick start
 

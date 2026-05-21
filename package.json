@@ -1,5 +1,5 @@
 {
-  "name": "exa-cli",
+  "name": "@spicadust/exa-cli",
   "version": "0.0.1",
   "description": "Unofficial command-line interface for the Exa API. Not affiliated with Exa.",
   "type": "module",
@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc && chmod +x dist/cli.js",
     "build:bun": "bun build src/cli.ts --compile --outfile dist-bin/exa",
-    "build:bun:all": "for t in bun-darwin-arm64 bun-darwin-x64 bun-linux-x64 bun-linux-arm64; do bun build src/cli.ts --compile --target=$t --outfile dist-bin/exa-${t#bun-}; done",
+    "build:bun:all": "for t in bun-darwin-arm64 bun-darwin-x64 bun-linux-x64 bun-linux-arm64 bun-windows-x64; do bun build src/cli.ts --compile --target=$t --outfile dist-bin/exa-${t#bun-}; done",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts",
@@ -44,6 +44,9 @@
     "url": "https://github.com/AirswitchAsa/exa-cli/issues"
   },
   "homepage": "https://github.com/AirswitchAsa/exa-cli#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "commander": "^14.0.0"
   },

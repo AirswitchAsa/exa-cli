@@ -25,10 +25,17 @@ quick start, see the [README](../README.md).
 ## Install
 
 ```bash
-npm install -g exa-cli          # from npm, once published
+npm install -g @spicadust/exa-cli
 ```
 
-Or build from source:
+No npm? Install a standalone binary — no Node.js runtime required (macOS /
+Linux):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AirswitchAsa/exa-cli/master/scripts/install.sh | sh
+```
+
+Or build from source (Node.js 20 or newer):
 
 ```bash
 git clone https://github.com/AirswitchAsa/exa-cli
@@ -38,9 +45,8 @@ npm run build
 npm link                        # puts `exa` on your PATH
 ```
 
-A standalone binary with no Node.js runtime requirement is also available via
-Bun — see [Distribution](#distribution) below. Building from source requires
-Node.js 20 or newer.
+See [Distribution](#distribution) below for Windows binaries and the full set
+of channels.
 
 ---
 
@@ -372,28 +378,54 @@ Base URL is `https://api.exa.ai` unless noted. Authentication is the
 
 ## Distribution
 
-`exa-cli` ships two ways.
+`exa-cli` ships three ways.
 
 ### npm (Node.js)
 
-The primary channel. Published as the `exa-cli` package with a single `exa`
-binary, targeting Node.js 20+.
+The primary channel. Published as the scoped `@spicadust/exa-cli` package with
+a single `exa` binary, targeting Node.js 20+.
 
 ```bash
-npm install -g exa-cli
+npm install -g @spicadust/exa-cli
+npx @spicadust/exa-cli search "hello"   # or run without installing
 ```
 
-### Bun (standalone binary)
+### Standalone binary (Bun)
 
 `bun build --compile` bundles the CLI and the Bun runtime into a single
-executable that needs no Node.js or npm install:
+executable that needs neither Node.js nor npm. The install script downloads the
+right binary for your platform from the GitHub release:
 
 ```bash
-npm run build:bun                 # builds dist-bin/exa for the current platform
-./dist-bin/exa search "hello"
+curl -fsSL https://raw.githubusercontent.com/AirswitchAsa/exa-cli/master/scripts/install.sh | sh
 ```
 
-`npm run build:bun:all` cross-compiles binaries for macOS and Linux on both
-arm64 and x64. Tagged `v*` releases attach these binaries as GitHub release
-assets and publish the npm package; see
-[`.github/workflows/release.yml`](../.github/workflows/release.yml).
+Binaries are published for macOS (arm64, x64), Linux (x64, arm64), and Windows
+(x64) on every tagged release — pick one manually from the
+[releases page](https://github.com/AirswitchAsa/exa-cli/releases/latest) if you
+prefer, or on Windows where the install script does not run.
+
+To build a binary yourself:
+
+```bash
+npm run build:bun                 # dist-bin/exa for the current platform
+npm run build:bun:all             # cross-compile every platform
+```
+
+### Release automation
+
+A tagged `v*` push runs [`.github/workflows/release.yml`](../.github/workflows/release.yml),
+which publishes the npm package and attaches a natively built, smoke-tested
+binary per platform to the GitHub release.
+
+The npm publish uses **npm Trusted Publishing** — OIDC, no long-lived token.
+The workflow mints a short-lived credential that npm verifies against the
+trusted publisher configured for the package, and provenance attestations are
+generated automatically. Because a trusted publisher cannot be configured
+until a package already exists, the very first publish is done manually
+(`npm login` then `npm publish`); every release after that goes through CI.
+
+Distribution is gated in layers: a tag push or manual dispatch already
+requires repository write access, an `authorize` job hard-fails for any actor
+other than the repository owner, and the publish job runs in a `release`
+GitHub Environment that can require a manual approval.
