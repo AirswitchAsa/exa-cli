@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc && chmod +x dist/cli.js",
     "build:bun": "bun build src/cli.ts --compile --outfile dist-bin/exa",
-    "build:bun:all": "for t in bun-darwin-arm64 bun-darwin-x64 bun-linux-x64 bun-linux-arm64 bun-windows-x64; do bun build src/cli.ts --compile --target=$t --outfile dist-bin/exa-${t#bun-}; done",
+    "build:bun:all": "for t in bun-darwin-arm64 bun-linux-x64 bun-linux-arm64 bun-windows-x64; do bun build src/cli.ts --compile --target=$t --outfile dist-bin/exa-${t#bun-}; done",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts",

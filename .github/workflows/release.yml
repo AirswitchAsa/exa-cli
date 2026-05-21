@@ -95,9 +95,6 @@ jobs:
           - target: exa-darwin-arm64
             runner: macos-14
             ext: ""
-          - target: exa-darwin-x64
-            runner: macos-13
-            ext: ""
           - target: exa-linux-x64
             runner: ubuntu-22.04
             ext: ""

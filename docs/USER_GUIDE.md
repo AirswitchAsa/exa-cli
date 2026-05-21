@@ -400,10 +400,11 @@ right binary for your platform from the GitHub release:
 curl -fsSL https://raw.githubusercontent.com/AirswitchAsa/exa-cli/master/scripts/install.sh | sh
 ```
 
-Binaries are published for macOS (arm64, x64), Linux (x64, arm64), and Windows
+Binaries are published for macOS (arm64), Linux (x64, arm64), and Windows
 (x64) on every tagged release — pick one manually from the
 [releases page](https://github.com/AirswitchAsa/exa-cli/releases/latest) if you
-prefer, or on Windows where the install script does not run.
+prefer, or on Windows where the install script does not run. Intel macOS is not
+a published target; install via npm or build from source there.
 
 To build a binary yourself:
 

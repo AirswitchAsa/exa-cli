@@ -31,6 +31,10 @@ case "$uname_m" in
   *)             err "unsupported arch: $uname_m" ;;
 esac
 
+if [ "$os" = "darwin" ] && [ "$arch" = "x64" ]; then
+  err "Intel macOS binaries are not published. Install with 'npm install -g @spicadust/exa-cli', or build from source."
+fi
+
 asset="exa-${os}-${arch}"
 
 if [ "$VERSION" = "latest" ]; then
