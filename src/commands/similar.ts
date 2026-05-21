@@ -20,6 +20,8 @@ interface SimilarOptions extends CommonOptions {
   endPublishedDate?: string;
   moderation?: boolean;
   text?: boolean;
+  highlights?: boolean;
+  summary?: boolean;
   bodyJson?: string;
 }
 
@@ -29,6 +31,8 @@ interface SimilarResult {
   publishedDate?: string;
   author?: string;
   text?: string;
+  highlights?: string[];
+  summary?: string;
 }
 
 interface SimilarResponse {
@@ -40,6 +44,16 @@ function printResults(response: SimilarResponse): void {
     printLine(`${index + 1}. ${result.title ?? "(untitled)"}`);
     printLine(`   ${result.url}`);
     if (result.publishedDate !== undefined) printLine(`   ${result.publishedDate}`);
+    if (result.summary !== undefined) {
+      printLine();
+      printLine(`   summary: ${result.summary.replace(/\s+/g, " ").trim()}`);
+    }
+    if (result.highlights !== undefined && result.highlights.length > 0) {
+      printLine();
+      for (const highlight of result.highlights) {
+        printLine(`   - ${highlight.replace(/\s+/g, " ").trim()}`);
+      }
+    }
     if (result.text !== undefined) {
       printLine();
       printLine(`   ${result.text.slice(0, 600).replace(/\s+/g, " ").trim()}`);
@@ -60,6 +74,8 @@ export const similarCommand = new Command("similar")
   .option("--end-published-date <date>", "only include links published before this ISO date")
   .option("--moderation", "enable content moderation")
   .option("--text", "include full page text for each result")
+  .option("--highlights", "include highlights for each result")
+  .option("--summary", "include summaries for each result")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (url: string, options: SimilarOptions) => {
@@ -75,7 +91,13 @@ export const similarCommand = new Command("similar")
       body.includeDomains = splitList(options.includeDomains);
     if (options.excludeDomains !== undefined)
       body.excludeDomains = splitList(options.excludeDomains);
-    if (options.text === true) body.contents = { text: true };
+    if (options.text === true || options.highlights === true || options.summary === true) {
+      body.contents = {
+        ...(options.text === true ? { text: true } : {}),
+        ...(options.highlights === true ? { highlights: true } : {}),
+        ...(options.summary === true ? { summary: true } : {}),
+      };
+    }
 
     const response = await client.post<SimilarResponse>(
       "/findSimilar",

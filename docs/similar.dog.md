@@ -10,8 +10,9 @@
 The `@User` runs `exa similar` with a source URL. The `#CLI` resolves the
 API key through `#ConfigResolver` and uses `#ExaClient` to POST to the Exa
 `/findSimilar` endpoint, which returns pages related to the source URL.
-Domain filters, crawl and published date filters, moderation, content text,
-and `--body-json` are available for request shaping.
+Domain filters, crawl and published date filters, moderation, content
+requests (`--text`, `--highlights`, `--summary`), and `--body-json` are
+available for request shaping.
 
 ## Outcome
 
@@ -24,3 +25,4 @@ and `--body-json` are available for request shaping.
 
 - Implemented in `src/commands/similar.ts`
 - Shares result formatting with `!Search`
+- The Exa `/findSimilar` endpoint is marked deprecated in the API reference

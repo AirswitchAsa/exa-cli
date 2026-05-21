@@ -8,12 +8,12 @@ import { chatCommand } from "./commands/chat.js";
 import { configCommand } from "./commands/config.js";
 import { contentsCommand } from "./commands/contents.js";
 import { contextCommand } from "./commands/context.js";
-import { keyCommand } from "./commands/key.js";
 import { monitorCommand } from "./commands/monitor.js";
 import { researchCommand } from "./commands/research.js";
 import { responseCommand } from "./commands/response.js";
 import { searchCommand } from "./commands/search.js";
 import { similarCommand } from "./commands/similar.js";
+import { teamCommand } from "./commands/team.js";
 import { websetCommand } from "./commands/webset.js";
 import { printError } from "./output.js";
 
@@ -33,7 +33,7 @@ for (const command of [
   agentCommand,
   monitorCommand,
   websetCommand,
-  keyCommand,
+  teamCommand,
   apiKeyCommand,
   configCommand,
 ]) {

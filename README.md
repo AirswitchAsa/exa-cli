@@ -1,87 +1,401 @@
 # exa-cli
 
-A command-line interface for the [Exa](https://exa.ai) search API.
+A command-line interface for the [Exa](https://exa.ai) API — the search
+engine built for AI.
 
-Exa is a search engine built for AI agents. It has a well-designed REST API
-but no official CLI. This project covers that surface from the terminal, so
-the same capabilities are available to shell scripts and agent harnesses
-without running an MCP server.
+Exa has a broad, well-designed REST API but no official CLI. `exa-cli` covers
+that surface from the terminal, so every Exa capability — search, content
+extraction, answers, research, agents, monitors, and Websets — is available to
+shell scripts and agent harnesses without running an MCP server.
 
-## Status
+It is hand-written TypeScript, one command module per API area, mapped
+directly onto Exa's published [API reference](https://exa.ai/docs/reference).
 
-Implemented end to end with hand-written TypeScript commands for the Exa REST
-API surface, plus unit tests for the client, credential resolution, and command
-request mappings. See [Commands](#commands) for the covered surface.
+---
+
+## Contents
+
+- [Install](#install)
+- [Authentication](#authentication)
+- [Output and conventions](#output-and-conventions)
+- [Command reference](#command-reference)
+  - [search](#exa-search) · [contents](#exa-contents) · [answer](#exa-answer) · [similar](#exa-similar)
+  - [chat](#exa-chat) · [context](#exa-context) · [response](#exa-response)
+  - [research](#exa-research) · [agent](#exa-agent)
+  - [monitor](#exa-monitor) · [webset](#exa-webset)
+  - [team](#exa-team) · [api-key](#exa-api-key) · [config](#exa-config)
+- [Endpoint map](#endpoint-map)
+- [Design reference](#design-reference)
+- [Development](#development)
+
+---
 
 ## Install
 
 ```bash
 npm install
 npm run build
-npm link   # optional: puts `exa` on your PATH
+npm link            # optional: puts `exa` on your PATH
 ```
 
-Requires Node.js 20 or newer.
+Requires Node.js 20 or newer. Until the package is published, `npm link`
+exposes the `exa` binary locally; otherwise call `node dist/cli.js`.
+
+---
 
 ## Authentication
 
-The CLI resolves credentials from `EXA_API_KEY` in the environment, then
-`EXA_API_KEY` in a current-directory `.env` file, then a stored key in
-`~/.exa/config.json`. It intentionally does not accept API keys as command-line
-flags, so secrets do not land in shell history or process listings.
+Every command needs an Exa API key. Create one in the
+[Exa dashboard](https://exa.ai). The CLI resolves the key from three sources,
+in order:
+
+1. `EXA_API_KEY` in the environment
+2. `EXA_API_KEY` in a `.env` file in the current directory
+3. A key stored in `~/.exa/config.json` via `exa api-key set`
 
 ```bash
-export EXA_API_KEY=...   # get a key at https://exa.ai
-exa api-key set          # store a reusable key locally
-exa api-key status
+export EXA_API_KEY=...        # option 1: environment
+exa api-key set               # option 3: store locally (reads stdin or a hidden prompt)
+exa api-key status            # show which source is active
 ```
 
-## Usage
+The CLI **never** accepts an API key as a command-line flag — that would leak
+the secret into shell history and process listings. Stored keys are written to
+a `0600` file inside a `0700` directory, and the key value is never echoed
+back. See the [Authentication convention](docs/conventions.md#authentication).
+
+> The [`team`](#exa-team) commands talk to Exa's Team Management API, which
+> expects a **team service key** rather than an ordinary search key.
+
+---
+
+## Output and conventions
+
+These rules hold across every command — they are specified once in
+[`docs/conventions.md`](docs/conventions.md) and enforced in one place.
+
+- **stdout vs stderr** — result content and JSON go to stdout; progress,
+  diagnostics, and errors go to stderr, so commands stay pipeable.
+- **`--json`** — every non-streaming command accepts `--json` for the raw API
+  response. Without it, the command prints a human-readable rendering.
+- **`--stream` / `--follow`** — commands backed by server-sent event endpoints
+  stream the event feed straight to stdout.
+- **`--body-json '<json>'`** — an escape hatch on every request-shaping
+  command. The JSON object is merged into the request body, so new or uncommon
+  Exa fields are reachable before the CLI grows a dedicated flag.
+- **Exit codes** — `0` on success; `1` for a usage error, a missing API key,
+  or an Exa API failure. API failures print the HTTP status and response body.
+- **Async commands** — `research`, `agent`, `webset`, and `response create`
+  accept `--wait` to poll to completion, `--poll-interval <ms>` to tune the
+  cadence, and `--timeout <ms>` to bound the wait.
+
+---
+
+## Command reference
+
+The CLI surface mirrors the shape of the Exa REST API. Single-resource actions
+are top-level commands; resources with a lifecycle are command groups with
+subcommands.
+
+### `exa search`
+
+Search the web and optionally extract result contents.
+Endpoint: `POST /search` — [docs](https://exa.ai/docs/reference/search).
 
 ```bash
 exa search "embeddings-based retrieval" --num-results 5
-exa search "exa api" --text --json
-exa answer "What changed in Exa's API recently?" --json
-exa research create "Compare Exa Websets and Monitors" --wait --json
+exa search "AI infra funding" --type deep --category "news" --text
+exa search "who is the CEO of OpenAI" --type deep \
+  --output-schema '{"type":"object","properties":{"leader":{"type":"string"}}}'
 ```
 
-## Commands
+Key flags: `--num-results` (default 10, max 100), `--type`
+(`auto`, `neural`, `fast`, `instant`, `deep-lite`, `deep`, `deep-reasoning`),
+`--category` (`company`, `research paper`, `news`, `personal site`,
+`financial report`, `people`), `--include-domains` / `--exclude-domains`,
+the crawl/published date filters, `--user-location`, `--moderation`,
+`--text` / `--highlights` / `--highlights-query` / `--summary` /
+`--summary-query` for per-result content, and `--output-schema` /
+`--system-prompt` / `--stream` for synthesized output.
 
-Target coverage is the full Exa REST API:
+### `exa contents`
 
-| Group      | Commands                                                        |
-| ---------- | --------------------------------------------------------------- |
-| `search`   | search the web and extract result contents                      |
-| `contents` | fetch clean page contents for URLs                              |
-| `answer`   | get an LLM answer informed by Exa search                        |
-| `similar`  | find pages similar to a URL                                     |
-| `chat`     | OpenAI-compatible chat completions                              |
-| `context`  | LLM-ready context generation                                    |
-| `response` | `create` · `get`                                                |
-| `research` | `create` · `get` · `list`                                       |
-| `agent`    | `create` · `get` · `list` · `cancel` · `delete` · `events`      |
-| `monitor`  | `create` · `get` · `list` · `update` · `delete` · `trigger` · `runs` · `batch` |
-| `webset`   | `create` · `get` · `list` · `update` · `delete` · `cancel` · `preview` · `search` · `items` · `enrich` · `export` · `import` · `webhook` · `events` · `monitor` · `team` |
-| `key`      | `create` · `get` · `list` · `update` · `delete` · `usage`       |
-| `api-key`  | `set` · `status` · `unset`                                      |
-| `config`   | `path` · `list` · `get` · `set` · `unset`                       |
+Fetch clean, parsed page contents for one or more URLs.
+Endpoint: `POST /contents` — [docs](https://exa.ai/docs/reference/get-contents).
+
+```bash
+exa contents https://exa.ai https://arxiv.org/abs/2307.06435
+exa contents https://exa.ai --summary --highlights-query "pricing"
+cat urls.txt | exa contents --max-characters 2000
+```
+
+URLs come from arguments, or — when none are given — newline-delimited from
+stdin. Flags cover the full extraction surface: `--max-characters`,
+`--include-html-tags`, `--verbosity`, `--include-sections` /
+`--exclude-sections`, `--highlights` / `--summary` (with `*-query` and
+`--summary-schema`), `--livecrawl` / `--max-age-hours` for freshness control,
+`--subpages` / `--subpage-target`, and `--links` / `--image-links`.
+
+### `exa answer`
+
+Ask a question and get an LLM answer with citations, grounded in a one-shot
+Exa search.
+Endpoint: `POST /answer` — [docs](https://exa.ai/docs/reference/answer).
+
+```bash
+exa answer "What is the latest valuation of SpaceX?" --text
+exa answer "Summarize Exa's launches this year" --stream
+exa answer "List Exa's search types" \
+  --output-schema '{"type":"object","properties":{"types":{"type":"array","items":{"type":"string"}}}}'
+```
+
+Use `--text` to include full source text, `--stream` for a server-sent stream,
+and `--output-schema` for a structured answer object.
+
+### `exa similar`
+
+Find pages similar to a given URL.
+Endpoint: `POST /findSimilar`.
+
+```bash
+exa similar https://arxiv.org/abs/2307.06435 --num-results 10 --text
+```
+
+Supports the same domain and date filters as `search`, plus `--text` /
+`--highlights` / `--summary`. Note that Exa marks `/findSimilar` as deprecated
+in favor of `search`.
+
+### `exa chat`
+
+Run an OpenAI-compatible chat completion backed by Exa's search models.
+Endpoint: `POST /chat/completions` —
+[docs](https://exa.ai/docs/reference/chat-completions).
+
+```bash
+exa chat "What changed in Exa's API this year?" --model exa-pro
+exa chat "Summarize this thread" --system "Be concise" --message "earlier turn"
+exa chat "..." --messages-json '[{"role":"user","content":"hi"}]' --stream
+```
+
+Models: `exa`, `exa-pro`, `exa-research`, `exa-research-pro`. Build the message
+list from `--system` + repeated `--message` + the prompt argument, or pass a
+full array with `--messages-json`.
+
+### `exa context`
+
+Build an LLM-ready context string from a web search — formatted for dropping
+straight into a prompt.
+Endpoint: `POST /context` — [docs](https://exa.ai/docs/reference/context).
+
+```bash
+exa context "how to stream server-sent events in Node"
+exa context "exa websets overview" --tokens 8000
+```
+
+With no `--tokens`, the CLI sends `tokensNum: "dynamic"` and lets Exa size the
+context. Pass `--tokens <50-100000>` for a fixed budget.
+
+### `exa response`
+
+Create and retrieve OpenAI Responses-compatible runs backed by Exa research
+models.
+Endpoints: `POST /responses`, `GET /responses/{id}` —
+[docs](https://exa.ai/docs/reference/openai-responses-api-with-exa).
+
+```bash
+exa response create "Research the agent-evaluation tooling landscape" --wait
+exa response get resp_abc123
+exa response get resp_abc123 --stream
+```
+
+`create` defaults to `exa-research` (`--model exa-research-pro` for deeper
+runs) and accepts `--instructions`, `--output-schema`, `--stream`, and the
+async `--wait` / `--poll-interval` / `--timeout` flags.
+
+### `exa research`
+
+Asynchronous deep-research tasks that explore the web, gather sources, and
+return structured, cited findings.
+Endpoints: `POST /research/v1`, `GET /research/v1/{id}`, `GET /research/v1` —
+[docs](https://exa.ai/docs/reference/research/overview).
+
+```bash
+exa research create "Compare Exa Websets and Monitors" --wait
+exa research create "..." --model exa-research-pro \
+  --output-schema '{"type":"object","properties":{"summary":{"type":"string"}}}'
+exa research get  r_abc123 --events
+exa research get  r_abc123 --follow      # live SSE updates
+exa research list --limit 20
+```
+
+Models: `exa-research-fast`, `exa-research`, `exa-research-pro`. `create`
+returns a task ID immediately, or the finished result with `--wait`.
+
+### `exa agent`
+
+Multi-step research agent runs — list-building, enrichment, structured
+extraction, and follow-up questions over prior runs.
+Endpoints: `POST /agent/runs` (plus `get`, `list`, `cancel`, `delete`,
+`events`) — [docs](https://exa.ai/docs/reference/agent-api/overview).
+
+```bash
+exa agent create "Find five recent AI infra Series A rounds" --wait
+exa agent create "Enrich these companies" --input '{"data":[{"company":"Exa"}]}' \
+  --output-schema '{"type":"object","properties":{"people":{"type":"array"}}}'
+exa agent events agent_run_abc123 --follow
+exa agent list --limit 10
+```
+
+`create` supports `--system-prompt`, `--effort`
+(`low`/`medium`/`high`/`xhigh`/`auto`), `--previous-run-id` to continue a
+finished run, and `--metadata`. The CLI sends the required `Exa-Beta` header
+automatically.
+
+### `exa monitor`
+
+Recurring Exa searches that run on a schedule and deliver new, deduplicated
+results to a webhook.
+Endpoints: `POST /monitors` (plus `get`, `list`, `update`, `delete`,
+`trigger`, `runs`, `batch`) —
+[docs](https://exa.ai/docs/reference/monitors-api-guide).
+
+```bash
+exa monitor create --name "AI funding" --query "AI infrastructure funding" \
+  --period 1d --webhook-url https://example.com/hook
+exa monitor list --status active
+exa monitor trigger mon_abc123
+exa monitor runs mon_abc123
+exa monitor batch --action pause --filter-status active            # dry run
+exa monitor batch --action pause --filter-status active --execute   # apply
+```
+
+The Exa API requires both a search query and a webhook URL on create.
+`batch` is a bulk delete/pause/unpause that stays a **dry run** until you pass
+`--execute`.
+
+### `exa webset`
+
+Websets — curated, verified, enriched collections of web entities. The
+largest command group; it covers websets and every subresource.
+Base: `POST /websets/v0/...` —
+[docs](https://exa.ai/docs/websets/api/overview).
+
+```bash
+exa webset create --query "Climate tech startups in Europe" --count 25 --wait
+exa webset get      ws_abc123 --expand items
+exa webset items list ws_abc123
+exa webset enrich create ws_abc123 --description "Find the CEO" --format text
+exa webset search create ws_abc123 --query "more like these" --behavior append
+exa webset webhook create --url https://example.com/hook --events webset.idle
+exa webset monitor create --webset-id ws_abc123 --cron "0 9 * * 1"
+exa webset team
+```
+
+Subcommands: `create`, `get`, `list`, `update`, `delete`, `cancel`,
+`preview`, and the nested groups `search`, `items`, `enrich`, `import`,
+`webhook`, `events`, `monitor`, `export`, plus `team`. Deeply nested
+structures (criteria, scope, entity, enrichment options) are reachable as JSON
+through `--search-json`, `--enrichment-json`, `--import-json`, and
+`--body-json`.
+
+### `exa team`
+
+Manage your Exa team's API keys through the Team Management API.
+Base: `https://admin-api.exa.ai/team-management/api-keys` —
+[docs](https://exa.ai/docs/reference/team-management/create-api-key).
+
+```bash
+exa team keys list
+exa team keys create --name "ci" --rate-limit 50 --budget-cents 50000
+exa team keys usage  key_abc123 --start-date 2026-01-01T00:00:00Z
+exa team keys delete key_abc123
+```
+
+These commands require a **team service key** with admin access, not an
+ordinary search key. `exa team keys` manages your team's *remote* keys;
+`exa api-key` (below) manages the *local* credential the CLI authenticates
+with — different things, hence different command names.
+
+### `exa api-key`
+
+Manage the local Exa credential stored by the CLI.
+
+```bash
+exa api-key set       # store a key (reads stdin, or a hidden prompt on a TTY)
+exa api-key status    # show the active key source, without printing the key
+exa api-key unset     # remove the stored key
+```
+
+### `exa config`
+
+Manage non-secret CLI preferences in `~/.exa/config.json`.
+
+```bash
+exa config set output json
+exa config list
+exa config path
+exa config unset output
+```
+
+API keys are rejected here — `exa config set apiKey ...` points you at
+`exa api-key set` instead.
+
+---
+
+## Endpoint map
+
+How each command group maps onto the Exa API. Every path is reachable; the
+table is the parity claim made concrete.
+
+| Command group | HTTP                                  | Path / base                                |
+| ------------- | ------------------------------------- | ------------------------------------------ |
+| `search`      | POST                                  | `/search`                                  |
+| `contents`    | POST                                  | `/contents`                                |
+| `answer`      | POST                                  | `/answer`                                  |
+| `similar`     | POST                                  | `/findSimilar`                             |
+| `chat`        | POST                                  | `/chat/completions`                        |
+| `context`     | POST                                  | `/context`                                 |
+| `response`    | POST / GET                            | `/responses`, `/responses/{id}`            |
+| `research`    | POST / GET                            | `/research/v1`                             |
+| `agent`       | POST / GET / DELETE                   | `/agent/runs`                              |
+| `monitor`     | POST / GET / PATCH / DELETE           | `/monitors`                                |
+| `webset`      | POST / GET / PATCH / DELETE           | `/websets/v0/*`                            |
+| `team keys`   | POST / GET / PUT / DELETE             | `admin-api.exa.ai/team-management/api-keys`|
+| `api-key`     | —                                     | local `~/.exa/config.json`                 |
+| `config`      | —                                     | local `~/.exa/config.json`                 |
+
+Base URL is `https://api.exa.ai` unless noted. Authentication is the
+`x-api-key` header on every request.
+
+---
 
 ## Design reference
 
-[`docs/`](docs/) holds the behavioral and design specification. The
-`.dog.md` files are [DOG](https://github.com/AirswitchAsa/dog) specs — the
-source of truth for actors, behaviors, components, and data. Start from
+[`docs/`](docs/) holds the behavioral and design specification. The `.dog.md`
+files are [DOG](https://github.com/AirswitchAsa/dog) specs — the source of
+truth for actors, behaviors, components, and data. Start from
 [`docs/index.dog.md`](docs/index.dog.md), and see
-[`docs/conventions.md`](docs/conventions.md) for cross-cutting CLI rules.
+[`docs/conventions.md`](docs/conventions.md) for the cross-cutting CLI rules.
+
+A Claude Code skill that wraps the CLI for agent workflows lives in
+[`skills/exa/`](skills/exa/).
+
+---
 
 ## Development
 
 ```bash
 npm run dev -- search "query"   # run from source with tsx
-npm run test
+npm run build                   # type-check and emit dist/
+npm run test                    # node:test unit suite
 npm run typecheck
-npm run lint
+npm run lint                    # biome
+npm run format
 ```
+
+The unit tests use a mock `fetch` to assert that each command maps its flags
+onto the correct method, path, headers, and request body — no network or API
+key required.
 
 ## License
 

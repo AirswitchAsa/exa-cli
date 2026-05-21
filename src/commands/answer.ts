@@ -44,7 +44,7 @@ function printAnswer(response: AnswerResponse): void {
 }
 
 export const answerCommand = new Command("answer")
-  .description("Get an LLM answer to a question, informed by Exa search.")
+  .description("Answer a question with an LLM, cited from a one-shot Exa search.")
   .argument("<question>", "question to answer")
   .option("--text", "include full text contents in cited search results")
   .option("--stream", "stream partial answer chunks as server-sent events")

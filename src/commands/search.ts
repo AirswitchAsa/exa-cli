@@ -28,7 +28,9 @@ interface SearchOptions extends CommonOptions {
   moderation?: boolean;
   text?: boolean;
   highlights?: boolean;
+  highlightsQuery?: string;
   summary?: boolean;
+  summaryQuery?: string;
   outputSchema?: string;
   systemPrompt?: string;
   stream?: boolean;
@@ -47,17 +49,28 @@ interface SearchResult {
 
 interface SearchResponse {
   results: SearchResult[];
+  searchType?: string;
+  output?: {
+    content?: string | JsonObject;
+  };
 }
 
 export const searchCommand = new Command("search")
   .description("Search the web and extract contents from the results.")
   .argument("<query>", "search query")
-  .option("-n, --num-results <count>", "number of results to return", parseInteger)
+  .option(
+    "-n, --num-results <count>",
+    "number of results to return (default 10, max 100)",
+    parseInteger,
+  )
   .option(
     "-t, --type <type>",
-    "search type: neural, auto, fast, deep-lite, deep, deep-reasoning, instant",
+    "search type: auto, neural, fast, instant, deep-lite, deep, deep-reasoning",
   )
-  .option("-c, --category <category>", "result category filter")
+  .option(
+    "-c, --category <category>",
+    "category focus: company, research paper, news, personal site, financial report, people",
+  )
   .option("--additional-queries <queries>", "comma-separated additional deep-search queries")
   .option("--include-domains <domains>", "comma-separated domains to include")
   .option("--exclude-domains <domains>", "comma-separated domains to exclude")
@@ -70,7 +83,9 @@ export const searchCommand = new Command("search")
   .option("--moderation", "enable content moderation")
   .option("--text", "include full page text for each result")
   .option("--highlights", "include highlights for each result")
+  .option("--highlights-query <query>", "query to guide highlight selection (implies --highlights)")
   .option("--summary", "include summaries for each result")
+  .option("--summary-query <query>", "query to guide summary generation (implies --summary)")
   .option("--output-schema <json>", "JSON schema for synthesized output")
   .option("--system-prompt <prompt>", "instructions for synthesized output or search planning")
   .option("--stream", "stream OpenAI-compatible chunks when supported by the search type")
@@ -101,12 +116,26 @@ export const searchCommand = new Command("search")
     if (options.excludeDomains !== undefined) {
       body.excludeDomains = splitList(options.excludeDomains);
     }
-    if (options.text === true || options.highlights === true || options.summary === true) {
-      body.contents = {
-        ...(options.text === true ? { text: true } : {}),
-        ...(options.highlights === true ? { highlights: true } : {}),
-        ...(options.summary === true ? { summary: true } : {}),
-      };
+    const wantsContents =
+      options.text === true ||
+      options.highlights === true ||
+      options.highlightsQuery !== undefined ||
+      options.summary === true ||
+      options.summaryQuery !== undefined;
+    if (wantsContents) {
+      const contents: JsonObject = {};
+      if (options.text === true) contents.text = true;
+      if (options.highlightsQuery !== undefined) {
+        contents.highlights = { query: options.highlightsQuery };
+      } else if (options.highlights === true) {
+        contents.highlights = true;
+      }
+      if (options.summaryQuery !== undefined) {
+        contents.summary = { query: options.summaryQuery };
+      } else if (options.summary === true) {
+        contents.summary = true;
+      }
+      body.contents = contents;
     }
     if (options.outputSchema !== undefined) {
       body.outputSchema = parseJsonObject(options.outputSchema, "--output-schema");
@@ -149,4 +178,13 @@ export const searchCommand = new Command("search")
       }
       printLine();
     });
+
+    if (response.output?.content !== undefined) {
+      printLine("synthesized output:");
+      printLine(
+        typeof response.output.content === "string"
+          ? response.output.content
+          : JSON.stringify(response.output.content, null, 2),
+      );
+    }
   });

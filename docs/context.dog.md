@@ -7,10 +7,10 @@
 
 ## Description
 
-The `@User` runs `exa context` with a query and a target token count. The
-`#CLI` resolves the API key through `#ConfigResolver` and uses `#ExaClient`
-to POST to the Exa `/context` endpoint. The command supports a numeric
-`--tokens` target, `--dynamic` token selection, `--body-json`, and `--json`.
+The `@User` runs `exa context` with a query and an optional target token
+count. The `#CLI` resolves the API key through `#ConfigResolver` and uses
+`#ExaClient` to POST to the Exa `/context` endpoint. The command supports a
+numeric `--tokens` target, `--body-json`, and `--json`.
 
 ## Outcome
 
@@ -21,4 +21,4 @@ to POST to the Exa `/context` endpoint. The command supports a numeric
 ## Notes
 
 - Implemented in `src/commands/context.ts`
-- Defaults to a 4096-token target when neither `--tokens` nor `--dynamic` is passed
+- Sends `tokensNum: "dynamic"` when `--tokens` is omitted, letting Exa size the context

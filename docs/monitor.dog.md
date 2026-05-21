@@ -10,7 +10,9 @@
 The `@User` manages monitors, which run saved Exa searches on a schedule
 and can notify a webhook. Subcommands cover the full lifecycle: create,
 retrieve, list, update, delete, trigger an immediate run, and inspect runs.
-The `batch` subcommand sends batch actions to `/monitors/batch`.
+The `batch` subcommand performs a bulk delete, pause, or unpause on
+monitors matching a filter, defaulting to a dry run until `--execute` is
+passed.
 Every subcommand resolves the API key through `#ConfigResolver` and calls
 the Exa API through `#ExaClient`.
 

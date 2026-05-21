@@ -14,7 +14,8 @@ paginated task history. Every subcommand resolves the API key through
 `#ConfigResolver` and calls the Exa API through `#ExaClient`.
 
 Because research tasks run asynchronously, `create` accepts `--wait` to
-poll until the task completes before returning.
+poll until the task completes before returning, and `get` accepts
+`--follow` to stream live task updates as server-sent events.
 
 ## Outcome
 

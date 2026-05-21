@@ -11,7 +11,7 @@ and sets a non-zero exit code.
 ## State
 
 - program: the root `commander` Command named `exa`
-- commands: the registered command groups — search, contents, answer, similar, chat, context, response, research, agent, monitor, webset, key, api-key, config
+- commands: the registered command groups — search, contents, answer, similar, chat, context, response, research, agent, monitor, webset, team, api-key, config
 
 ## Events
 

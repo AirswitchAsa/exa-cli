@@ -45,13 +45,19 @@ function bodyFrom(options: KeyCreateOptions | KeyUpdateOptions): JsonObject {
   return mergeBodyJson(body, options.bodyJson);
 }
 
-export const keyCommand = new Command("key").description("Team API key management.");
+export const teamCommand = new Command("team").description(
+  "Manage your Exa team. Requires a team service key (see `exa team keys`).",
+);
 
-keyCommand
+const keysCommand = teamCommand
+  .command("keys")
+  .description("Create and manage the Exa API keys belonging to your team.");
+
+keysCommand
   .command("create")
-  .description("Create an API key.")
+  .description("Create a new team API key.")
   .option("--name <name>", "API key name")
-  .option("--rate-limit <limit>", "request rate limit", parseInteger)
+  .option("--rate-limit <limit>", "request rate limit, in requests per second", parseInteger)
   .option("--budget-cents <cents>", "spending budget for the key, in cents", parseInteger)
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
@@ -61,9 +67,9 @@ keyCommand
     printMaybeJson(response, options.json);
   });
 
-keyCommand
+keysCommand
   .command("get")
-  .description("Retrieve an API key by ID.")
+  .description("Retrieve a team API key by ID.")
   .argument("<id>", "API key ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
@@ -72,9 +78,9 @@ keyCommand
     printMaybeJson(response, options.json);
   });
 
-keyCommand
+keysCommand
   .command("list")
-  .description("List API keys.")
+  .description("List the team's API keys.")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions) => {
     const client = clientFor(TEAM_BASE_URL);
@@ -82,12 +88,12 @@ keyCommand
     printMaybeJson(response, options.json, true);
   });
 
-keyCommand
+keysCommand
   .command("update")
-  .description("Update an API key.")
+  .description("Update a team API key's name, rate limit, or budget.")
   .argument("<id>", "API key ID")
   .option("--name <name>", "API key name")
-  .option("--rate-limit <limit>", "request rate limit", parseInteger)
+  .option("--rate-limit <limit>", "request rate limit, in requests per second", parseInteger)
   .option("--budget-cents <cents>", "spending budget for the key, in cents", parseInteger)
   .option("--clear-budget", "remove the spending budget")
   .option("--body-json <json>", "merge raw JSON request fields")
@@ -98,9 +104,9 @@ keyCommand
     printMaybeJson(response, options.json);
   });
 
-keyCommand
+keysCommand
   .command("delete")
-  .description("Delete an API key.")
+  .description("Delete a team API key.")
   .argument("<id>", "API key ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
@@ -109,12 +115,12 @@ keyCommand
     printMaybeJson(response, options.json);
   });
 
-keyCommand
+keysCommand
   .command("usage")
-  .description("Retrieve usage analytics for an API key.")
+  .description("Retrieve usage and billing analytics for a team API key.")
   .argument("<id>", "API key ID")
-  .option("--start-date <date>", "usage start date")
-  .option("--end-date <date>", "usage end date")
+  .option("--start-date <date>", "usage start date, ISO 8601 (defaults to 30 days ago)")
+  .option("--end-date <date>", "usage end date, ISO 8601 (defaults to now)")
   .option("--group-by <unit>", "usage granularity: hour, day, month")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: KeyUsageOptions) => {

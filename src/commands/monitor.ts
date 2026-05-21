@@ -51,6 +51,16 @@ interface MonitorRunsOptions extends CommonOptions {
   limit?: number;
 }
 
+interface MonitorBatchOptions extends CommonOptions {
+  action?: string;
+  filterName?: string;
+  filterStatus?: string;
+  filterMetadata?: string;
+  execute?: boolean;
+  limit?: number;
+  bodyJson?: string;
+}
+
 function splitCsv(value: string): string[] {
   return value
     .split(",")
@@ -122,12 +132,12 @@ export const monitorCommand = new Command("monitor").description(
 
 monitorCommand
   .command("create")
-  .description("Create a monitor.")
+  .description("Create a monitor (the API requires --query and --webhook-url).")
   .option("--name <name>", "monitor display name")
-  .option("--query <query>", "search query for each run")
+  .option("--query <query>", "search query for each run (required)")
   .option("--num-results <count>", "number of search results per run", parseInteger)
   .option("--period <duration>", "interval duration such as 1h, 6h, 1d, 7d")
-  .option("--webhook-url <url>", "HTTPS webhook URL")
+  .option("--webhook-url <url>", "HTTPS webhook URL for run notifications (required)")
   .option("--webhook-events <events>", "comma-separated webhook event names")
   .option("--output-schema <json>", "JSON schema for monitor output")
   .option("--metadata <json>", "metadata object")
@@ -250,14 +260,34 @@ monitorCommand
 
 monitorCommand
   .command("batch")
-  .description("Perform a batch action on monitors.")
-  .requiredOption("--body-json <json>", "batch request JSON body")
+  .description("Bulk delete, pause, or unpause monitors matching a filter.")
+  .option("--action <action>", "action to perform: delete, pause, unpause")
+  .option("--filter-name <name>", "match monitors whose name contains this substring")
+  .option("--filter-status <status>", "match monitors with status: active, paused, disabled")
+  .option("--filter-metadata <json>", "match monitors by metadata key-value pairs")
+  .option("--execute", "perform the action; without this flag the request is a dry run")
+  .option("--limit <count>", "maximum monitors to process per request", parseInteger)
+  .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
-  .action(async (options: CommonOptions & { bodyJson: string }) => {
+  .action(async (options: MonitorBatchOptions) => {
     const client = clientFor();
+    const body: JsonObject = {};
+    addIfDefined(body, "action", options.action);
+
+    const filter: JsonObject = {};
+    addIfDefined(filter, "name", options.filterName);
+    addIfDefined(filter, "status", options.filterStatus);
+    if (options.filterMetadata !== undefined) {
+      filter.metadata = parseJsonObject(options.filterMetadata, "--filter-metadata");
+    }
+    if (Object.keys(filter).length > 0) body.filter = filter;
+
+    if (options.execute === true) body.dry_run = false;
+    addIfDefined(body, "limit", options.limit);
+
     const response = await client.post<unknown>(
       "/monitors/batch",
-      parseJsonObject(options.bodyJson, "--body-json"),
+      mergeBodyJson(body, options.bodyJson),
     );
     printMaybeJson(response, options.json);
   });

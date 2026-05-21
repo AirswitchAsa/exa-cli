@@ -11,12 +11,12 @@ import { chatCommand } from "../src/commands/chat.js";
 import { configCommand } from "../src/commands/config.js";
 import { contentsCommand } from "../src/commands/contents.js";
 import { contextCommand } from "../src/commands/context.js";
-import { keyCommand } from "../src/commands/key.js";
 import { monitorCommand } from "../src/commands/monitor.js";
 import { researchCommand } from "../src/commands/research.js";
 import { responseCommand } from "../src/commands/response.js";
 import { searchCommand } from "../src/commands/search.js";
 import { similarCommand } from "../src/commands/similar.js";
+import { teamCommand } from "../src/commands/team.js";
 import { websetCommand } from "../src/commands/webset.js";
 import { configPath, readUserConfig } from "../src/config.js";
 import { assertHeader, runCommand, withMockFetch } from "./helpers.js";
@@ -55,7 +55,7 @@ test("commands do not expose API keys as flags", () => {
     agentCommand,
     monitorCommand,
     websetCommand,
-    keyCommand,
+    teamCommand,
     apiKeyCommand,
     configCommand,
   ].flatMap((command) => allCommands(command));
@@ -270,12 +270,21 @@ test("monitor commands map CRUD, metadata filters, runs, and batch", async () =>
   );
 });
 
-test("key commands use Team Management paths and canonical fields", async () => {
+test("team keys commands use Team Management paths and canonical fields", async () => {
   await withMockFetch(
     () => ({ apiKey: { id: "k_1" } }),
     async (calls) => {
-      await runCommand(keyCommand, ["create", "--name", "ci", "--budget-cents", "5000", "--json"]);
-      await runCommand(keyCommand, [
+      await runCommand(teamCommand, [
+        "keys",
+        "create",
+        "--name",
+        "ci",
+        "--budget-cents",
+        "5000",
+        "--json",
+      ]);
+      await runCommand(teamCommand, [
+        "keys",
         "usage",
         "k_1",
         "--start-date",
@@ -288,8 +297,43 @@ test("key commands use Team Management paths and canonical fields", async () => 
       assert.equal(calls[0]?.url.hostname, "admin-api.exa.ai");
       assert.equal(calls[0]?.url.pathname, "/team-management/api-keys");
       assert.deepEqual(calls[0]?.body, { name: "ci", budgetCents: 5000 });
+      assert.equal(calls[1]?.url.pathname, "/team-management/api-keys/k_1/usage");
       assert.equal(calls[1]?.url.searchParams.get("start_date"), "2026-01-01T00:00:00Z");
       assert.equal(calls[1]?.url.searchParams.get("group_by"), "day");
+    },
+  );
+});
+
+test("context defaults to dynamic token sizing", async () => {
+  await withMockFetch(
+    () => ({ response: "ctx" }),
+    async (calls) => {
+      await runCommand(contextCommand, ["exa api", "--json"]);
+
+      assert.equal(calls[0]?.url.pathname, "/context");
+      assert.deepEqual(calls[0]?.body, { query: "exa api", tokensNum: "dynamic" });
+    },
+  );
+});
+
+test("monitor batch filters and stays a dry run unless --execute is passed", async () => {
+  await withMockFetch(
+    () => ({ action: "pause", affected: 0, ids: [], dry_run: true, has_more: false }),
+    async (calls) => {
+      await runCommand(monitorCommand, [
+        "batch",
+        "--action",
+        "pause",
+        "--filter-status",
+        "active",
+        "--json",
+      ]);
+
+      assert.equal(calls[0]?.url.pathname, "/monitors/batch");
+      assert.deepEqual(calls[0]?.body, {
+        action: "pause",
+        filter: { status: "active" },
+      });
     },
   );
 });

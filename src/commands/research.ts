@@ -12,6 +12,7 @@ import {
   parseJsonObject,
   pollUntilTerminal,
   printMaybeJson,
+  printStream,
 } from "./_shared.js";
 
 interface ResearchCreateOptions extends CommonOptions {
@@ -25,6 +26,7 @@ interface ResearchCreateOptions extends CommonOptions {
 
 interface ResearchGetOptions extends CommonOptions {
   events?: boolean;
+  follow?: boolean;
 }
 
 interface ResearchListOptions extends CommonOptions {
@@ -114,10 +116,22 @@ researchCommand
   .description("Retrieve a research task by ID.")
   .argument("<id>", "research task ID")
   .option("--events", "include the detailed event log")
+  .option("--follow", "stream live task updates as server-sent events")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ResearchGetOptions) => {
     const client = clientFor();
-    const task = await client.get<ResearchTask>(`${RESEARCH_PATH}/${encodePath(id)}`, {
+    const path = `${RESEARCH_PATH}/${encodePath(id)}`;
+
+    if (options.follow === true) {
+      const stream = await client.stream(path, {
+        headers: { Accept: "text/event-stream" },
+        query: { stream: true, events: options.events },
+      });
+      await printStream(stream);
+      return;
+    }
+
+    const task = await client.get<ResearchTask>(path, {
       query: { events: options.events },
     });
 

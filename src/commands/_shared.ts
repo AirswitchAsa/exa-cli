@@ -119,7 +119,8 @@ export function formatIdStatus(value: unknown, fallbackId = "id"): string {
 }
 
 export function printList(response: unknown): void {
-  const items = getArray(response, "data") ?? getArray(response, "results");
+  const items =
+    getArray(response, "data") ?? getArray(response, "results") ?? getArray(response, "apiKeys");
   if (items === undefined) {
     printJson(response);
     return;

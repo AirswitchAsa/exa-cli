@@ -71,7 +71,7 @@ function printChat(response: ChatCompletionResponse): void {
 }
 
 export const chatCommand = new Command("chat")
-  .description("Create an OpenAI-compatible Exa chat completion.")
+  .description("Run an OpenAI-compatible chat completion backed by Exa search models.")
   .argument("<prompt>", "user prompt")
   .option("--model <model>", "model: exa, exa-pro, exa-research, exa-research-pro")
   .option("--system <prompt>", "system message")

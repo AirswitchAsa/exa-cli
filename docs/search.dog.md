@@ -13,9 +13,9 @@ and uses `#ExaClient` to POST to the Exa `/search` endpoint. Supported flags
 cover the main request surface: `--num-results`, `--type`, `--category`,
 `--additional-queries`, domain include/exclude filters, crawl and published
 date filters, `--user-location`, `--compliance`, `--moderation`, content
-requests (`--text`, `--highlights`, `--summary`), synthesized output controls
-(`--output-schema`, `--system-prompt`), `--stream`, `--body-json`,
-and `--json`.
+requests (`--text`, `--highlights`, `--highlights-query`, `--summary`,
+`--summary-query`), synthesized output controls (`--output-schema`,
+`--system-prompt`), `--stream`, `--body-json`, and `--json`.
 
 Comma-separated list flags are split into arrays. Content flags send a
 `contents` object in the request body. `--body-json` remains available for
