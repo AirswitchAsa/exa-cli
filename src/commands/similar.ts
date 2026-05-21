@@ -61,7 +61,6 @@ export const similarCommand = new Command("similar")
   .option("--moderation", "enable content moderation")
   .option("--text", "include full page text for each result")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (url: string, options: SimilarOptions) => {
     const client = clientFor(options);

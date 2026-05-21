@@ -12,7 +12,7 @@ The `@User` runs `exa chat` with a prompt and optional chat controls. The
 to POST to the Exa `/chat/completions` endpoint. The command supports simple
 prompt input, optional system and additional user messages, raw
 `--messages-json`, model selection, text inclusion, explicit query,
-structured output schema, streaming, `--body-json`, `--api-key`, and `--json`.
+structured output schema, streaming, `--body-json`, and `--json`.
 
 ## Outcome
 

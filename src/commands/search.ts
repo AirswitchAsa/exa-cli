@@ -73,7 +73,6 @@ export const searchCommand = new Command("search")
   .option("--system-prompt <prompt>", "instructions for synthesized output or search planning")
   .option("--stream", "stream OpenAI-compatible chunks when supported by the search type")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (query: string, options: SearchOptions) => {
     const client = clientFor(options);

@@ -3,14 +3,13 @@ import { resolveApiKey } from "../config.js";
 import { printJson, printLine } from "../output.js";
 
 export interface CommonOptions {
-  apiKey?: string;
   json?: boolean;
 }
 
 export type JsonObject = Record<string, unknown>;
 
-export function clientFor(options: CommonOptions, baseUrl?: string): ExaClient {
-  return new ExaClient({ apiKey: resolveApiKey(options.apiKey), baseUrl });
+export function clientFor(_options: CommonOptions, baseUrl?: string): ExaClient {
+  return new ExaClient({ apiKey: resolveApiKey(), baseUrl });
 }
 
 export function parseInteger(value: string): number {

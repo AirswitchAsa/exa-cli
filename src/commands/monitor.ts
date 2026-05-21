@@ -132,7 +132,6 @@ monitorCommand
   .option("--output-schema <json>", "JSON schema for monitor output")
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: MonitorCreateOptions) => {
     const client = clientFor(options);
@@ -144,7 +143,6 @@ monitorCommand
   .command("get")
   .description("Retrieve a monitor by ID.")
   .argument("<id>", "monitor ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options);
@@ -160,7 +158,6 @@ monitorCommand
   .option("--limit <count>", "number of monitors to return", parseInteger)
   .option("--name <name>", "filter by name")
   .option("--metadata <json>", "metadata filters encoded as JSON")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: MonitorListOptions) => {
     const client = clientFor(options);
@@ -199,7 +196,6 @@ monitorCommand
   .option("--metadata <json>", "metadata object")
   .option("--clear-metadata", "remove metadata")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: MonitorUpdateOptions) => {
     const client = clientFor(options);
@@ -214,7 +210,6 @@ monitorCommand
   .command("delete")
   .description("Delete a monitor.")
   .argument("<id>", "monitor ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options);
@@ -226,7 +221,6 @@ monitorCommand
   .command("trigger")
   .description("Trigger a monitor run immediately.")
   .argument("<id>", "monitor ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options);
@@ -241,7 +235,6 @@ monitorCommand
   .argument("[runId]", "run ID")
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of runs to return", parseInteger)
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, runId: string | undefined, options: MonitorRunsOptions) => {
     const client = clientFor(options);
@@ -259,7 +252,6 @@ monitorCommand
   .command("batch")
   .description("Perform a batch action on monitors.")
   .requiredOption("--body-json <json>", "batch request JSON body")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions & { bodyJson: string }) => {
     const client = clientFor(options);

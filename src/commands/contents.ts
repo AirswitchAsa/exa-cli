@@ -144,7 +144,6 @@ export const contentsCommand = new Command("contents")
   .option("--image-links <count>", "number of image links to return per page", parseInteger)
   .option("--compliance <mode>", "enterprise compliance mode, such as hipaa")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (urls: string[], options: ContentsOptions) => {
     const stdinUrls = await readStdinLines();

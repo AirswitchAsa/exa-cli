@@ -25,11 +25,12 @@ REST API so the CLI surface is predictable from the API reference.
 
 ## Authentication
 
-The Exa API key is resolved by the `ConfigResolver` component: an explicit
-`--api-key` flag wins, then `EXA_API_KEY` from the environment, then an
-`EXA_API_KEY` entry in the current working directory's `.env` file. A missing
-key is a usage error with a remediation message — it is not an API error. The
-key value is never echoed back to output.
+The Exa API key is resolved by the `ConfigResolver` component from
+`EXA_API_KEY` in the environment, then an `EXA_API_KEY` entry in the current
+working directory's `.env` file. The CLI intentionally does not expose an
+API-key command flag, avoiding shell history and process-list leaks. A
+missing key is a usage error with a remediation message — it is not an API
+error. The key value is never echoed back to output.
 
 ## Asynchronous commands
 

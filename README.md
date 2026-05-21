@@ -25,8 +25,10 @@ Requires Node.js 20 or newer.
 
 ## Authentication
 
-The CLI resolves credentials in this order: `--api-key`, `EXA_API_KEY` from
-the environment, then `EXA_API_KEY` in a current-directory `.env` file.
+The CLI resolves credentials from `EXA_API_KEY` in the environment, then
+`EXA_API_KEY` in a current-directory `.env` file. It intentionally does not
+accept API keys as command-line flags, so secrets do not land in shell history
+or process listings.
 
 ```bash
 export EXA_API_KEY=...   # get a key at https://exa.ai

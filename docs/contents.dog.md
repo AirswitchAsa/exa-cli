@@ -23,4 +23,4 @@ shell pipelines.
 
 - Implemented in `src/commands/contents.ts`
 - Supports URL arguments, stdin URLs, `--max-characters`, `--livecrawl`,
-  `--api-key`, `--json`, and `--body-json` for advanced request fields
+  `--json`, and `--body-json` for advanced request fields

@@ -50,7 +50,6 @@ export const answerCommand = new Command("answer")
   .option("--stream", "stream partial answer chunks as server-sent events")
   .option("--output-schema <json>", "JSON schema for structured answer output")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (question: string, options: AnswerOptions) => {
     const client = clientFor(options);

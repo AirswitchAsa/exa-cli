@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { Command } from "commander";
 import { agentCommand } from "../src/commands/agent.js";
 import { answerCommand } from "../src/commands/answer.js";
 import { chatCommand } from "../src/commands/chat.js";
@@ -13,6 +14,34 @@ import { searchCommand } from "../src/commands/search.js";
 import { similarCommand } from "../src/commands/similar.js";
 import { websetCommand } from "../src/commands/webset.js";
 import { assertHeader, runCommand, withMockFetch } from "./helpers.js";
+
+function allCommands(command: Command): Command[] {
+  return [command, ...command.commands.flatMap((child) => allCommands(child))];
+}
+
+test("commands do not expose API keys as flags", () => {
+  const commands = [
+    searchCommand,
+    contentsCommand,
+    answerCommand,
+    similarCommand,
+    chatCommand,
+    contextCommand,
+    responseCommand,
+    researchCommand,
+    agentCommand,
+    monitorCommand,
+    websetCommand,
+    keyCommand,
+  ].flatMap((command) => allCommands(command));
+
+  for (const command of commands) {
+    assert.equal(
+      command.options.some((option) => option.long === "--api-key"),
+      false,
+    );
+  }
+});
 
 test("search maps rich filters to /search", async () => {
   await withMockFetch(

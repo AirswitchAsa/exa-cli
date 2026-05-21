@@ -72,7 +72,6 @@ researchCommand
   .option("--wait", "poll until the task reaches a terminal status")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (instructions: string, options: ResearchCreateOptions) => {
     const client = clientFor(options);
@@ -112,7 +111,6 @@ researchCommand
   .description("Retrieve a research task by ID.")
   .argument("<id>", "research task ID")
   .option("--events", "include the detailed event log")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ResearchGetOptions) => {
     const client = clientFor(options);
@@ -132,7 +130,6 @@ researchCommand
   .description("List research tasks.")
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of tasks to return, 1-50", parseInteger)
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: ResearchListOptions) => {
     const client = clientFor(options);

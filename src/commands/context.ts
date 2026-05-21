@@ -24,7 +24,6 @@ export const contextCommand = new Command("context")
   .option("--tokens <count>", "target token count, 50-100000", parseInteger)
   .option("--dynamic", "let Exa choose the context token count dynamically")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (query: string, options: ContextOptions) => {
     const client = clientFor(options);

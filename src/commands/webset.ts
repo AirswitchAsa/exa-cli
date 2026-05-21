@@ -254,7 +254,6 @@ websetCommand
   .option("--wait", "poll until the webset reaches idle")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetCreateOptions) => {
     const client = websetClient(options);
@@ -277,7 +276,6 @@ websetCommand
   .description("Retrieve a webset by ID.")
   .argument("<id>", "webset ID or external ID")
   .option("--expand <values>", "comma-separated resources to expand, such as items")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebsetGetOptions) => {
     const client = websetClient(options);
@@ -293,7 +291,6 @@ websetCommand
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of websets to return", parseInteger)
   .option("--search <term>", "filter by ID, external ID, or title")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetListOptions) => {
     const client = websetClient(options);
@@ -311,7 +308,6 @@ websetCommand
   .option("--metadata <json>", "metadata object")
   .option("--clear-metadata", "remove metadata")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebsetUpdateOptions) => {
     const client = websetClient(options);
@@ -326,7 +322,6 @@ websetCommand
   .command("delete")
   .description("Delete a webset.")
   .argument("<id>", "webset ID or external ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -338,7 +333,6 @@ websetCommand
   .command("cancel")
   .description("Cancel running webset operations.")
   .argument("<id>", "webset ID or external ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -353,7 +347,6 @@ websetCommand
   .option("--count <count>", "number of preview items when --search is set", parseInteger)
   .option("--search", "include preview items")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetPreviewOptions) => {
     const client = websetClient(options);
@@ -384,7 +377,6 @@ searchCommand
   .option("--count <count>", "number of items to find", parseInteger)
   .option("--behavior <behavior>", "behavior: override or append")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: SearchOptions) => {
     const client = websetClient(options);
@@ -405,7 +397,6 @@ searchCommand
   .description("Retrieve a webset search.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "search ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -420,7 +411,6 @@ searchCommand
   .description("Cancel a running webset search.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "search ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -441,7 +431,6 @@ itemsCommand
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of items to return", parseInteger)
   .option("--source-id <id>", "source ID filter")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: PageOptions) => {
     const client = websetClient(options);
@@ -456,7 +445,6 @@ itemsCommand
   .description("Retrieve a webset item.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "item ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -471,7 +459,6 @@ itemsCommand
   .description("Delete a webset item.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "item ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -492,7 +479,6 @@ enrichCommand
   .option("--options <labels>", "comma-separated labels for options format")
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: EnrichmentOptions) => {
     const client = websetClient(options);
@@ -508,7 +494,6 @@ enrichCommand
   .description("Retrieve an enrichment.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "enrichment ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -529,7 +514,6 @@ enrichCommand
   .option("--metadata <json>", "metadata object")
   .option("--clear-metadata", "remove metadata")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: EnrichmentOptions) => {
     const client = websetClient(options);
@@ -545,7 +529,6 @@ enrichCommand
   .description("Delete an enrichment.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "enrichment ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -560,7 +543,6 @@ enrichCommand
   .description("Cancel a running enrichment.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "enrichment ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -583,7 +565,6 @@ importCommand
   .option("--csv-identifier <index>", "CSV identifier column index", parseInteger)
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: ImportCreateOptions) => {
     const client = websetClient(options);
@@ -608,7 +589,6 @@ importCommand
   .description("List imports.")
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of imports to return", parseInteger)
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: PageOptions) => {
     const client = websetClient(options);
@@ -622,7 +602,6 @@ importCommand
   .command("get")
   .description("Retrieve an import.")
   .argument("<id>", "import ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -637,7 +616,6 @@ importCommand
   .option("--title <title>", "import title")
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ImportUpdateOptions) => {
     const client = websetClient(options);
@@ -656,7 +634,6 @@ importCommand
   .command("delete")
   .description("Delete an import.")
   .argument("<id>", "import ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -673,7 +650,6 @@ webhookCommand
   .option("--events <events>", "comma-separated event types")
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebhookOptions) => {
     const client = websetClient(options);
@@ -686,7 +662,6 @@ webhookCommand
   .description("List webhooks.")
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of webhooks to return", parseInteger)
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: PageOptions) => {
     const client = websetClient(options);
@@ -700,7 +675,6 @@ webhookCommand
   .command("get")
   .description("Retrieve a webhook.")
   .argument("<id>", "webhook ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -717,7 +691,6 @@ webhookCommand
   .option("--metadata <json>", "metadata object")
   .option("--clear-metadata", "remove metadata")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebhookOptions) => {
     const client = websetClient(options);
@@ -732,7 +705,6 @@ webhookCommand
   .command("delete")
   .description("Delete a webhook.")
   .argument("<id>", "webhook ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -748,7 +720,6 @@ webhookCommand
   .option("--limit <count>", "number of attempts to return", parseInteger)
   .option("--event-type <type>", "event type filter")
   .option("--successful <true|false>", "filter by delivery success", parseBoolean)
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebhookAttemptOptions) => {
     const client = websetClient(options);
@@ -775,7 +746,6 @@ eventsCommand
   .option("--types <types>", "comma-separated event types")
   .option("--created-before <date>", "only events created before this ISO datetime")
   .option("--created-after <date>", "only events created after this ISO datetime")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: EventListOptions) => {
     const client = websetClient(options);
@@ -795,7 +765,6 @@ eventsCommand
   .command("get")
   .description("Retrieve an event.")
   .argument("<id>", "event ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -816,7 +785,6 @@ websetMonitorCommand
   .option("--behavior <json>", "monitor behavior JSON object")
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetMonitorOptions) => {
     const client = websetClient(options);
@@ -830,7 +798,6 @@ websetMonitorCommand
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of monitors to return", parseInteger)
   .option("--webset-id <id>", "webset ID filter")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: PageOptions & { websetId?: string }) => {
     const client = websetClient(options);
@@ -848,7 +815,6 @@ websetMonitorCommand
   .command("get")
   .description("Retrieve a webset monitor.")
   .argument("<id>", "monitor ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -866,7 +832,6 @@ websetMonitorCommand
   .option("--behavior <json>", "monitor behavior JSON object")
   .option("--metadata <json>", "metadata object")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebsetMonitorOptions) => {
     const client = websetClient(options);
@@ -881,7 +846,6 @@ websetMonitorCommand
   .command("delete")
   .description("Delete a webset monitor.")
   .argument("<id>", "monitor ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = websetClient(options);
@@ -894,7 +858,6 @@ websetMonitorCommand
   .description("List monitor runs, or retrieve a run when run ID is provided.")
   .argument("<monitor>", "monitor ID")
   .argument("[id]", "run ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (monitor: string, id: string | undefined, options: CommonOptions) => {
     const client = websetClient(options);
@@ -909,7 +872,6 @@ websetMonitorCommand
 websetCommand
   .command("team")
   .description("Show the authenticated Websets team.")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions) => {
     const client = websetClient(options);
@@ -926,7 +888,6 @@ exportCommand
   .argument("<webset>", "webset ID")
   .option("--format <format>", "export format")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: ExportOptions) => {
     const client = websetClient(options);
@@ -943,7 +904,6 @@ exportCommand
   .description("Retrieve a webset export.")
   .argument("<webset>", "webset ID")
   .argument("<id>", "export ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
     const client = websetClient(options);

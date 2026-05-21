@@ -5,11 +5,6 @@ import { join } from "node:path";
 import test from "node:test";
 import { resolveApiKey } from "../src/config.js";
 
-test("resolveApiKey prefers explicit override", () => {
-  process.env.EXA_API_KEY = "env-key";
-  assert.equal(resolveApiKey("flag-key"), "flag-key");
-});
-
 test("resolveApiKey falls back to EXA_API_KEY", () => {
   process.env.EXA_API_KEY = "env-key";
   assert.equal(resolveApiKey(), "env-key");
@@ -44,7 +39,7 @@ test("resolveApiKey gives an actionable missing-key error", () => {
 
   try {
     process.chdir(dir);
-    assert.throws(() => resolveApiKey(), /Pass --api-key <key>.*EXA_API_KEY.*\.env/);
+    assert.throws(() => resolveApiKey(), /Set EXA_API_KEY.*\.env/);
   } finally {
     process.chdir(previousCwd);
     rmSync(dir, { recursive: true, force: true });

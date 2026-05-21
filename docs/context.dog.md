@@ -10,8 +10,7 @@
 The `@User` runs `exa context` with a query and a target token count. The
 `#CLI` resolves the API key through `#ConfigResolver` and uses `#ExaClient`
 to POST to the Exa `/context` endpoint. The command supports a numeric
-`--tokens` target, `--dynamic` token selection, `--body-json`, `--api-key`,
-and `--json`.
+`--tokens` target, `--dynamic` token selection, `--body-json`, and `--json`.
 
 ## Outcome
 

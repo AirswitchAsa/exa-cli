@@ -81,7 +81,6 @@ responseCommand
   .option("--wait", "poll until the response reaches a terminal status")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (input: string, options: ResponseCreateOptions) => {
     const client = clientFor(options);
@@ -123,7 +122,6 @@ responseCommand
   .description("Retrieve a response by ID.")
   .argument("<id>", "response ID")
   .option("--stream", "stream response events when supported")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ResponseGetOptions) => {
     const client = clientFor(options);

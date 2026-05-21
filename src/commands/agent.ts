@@ -80,7 +80,6 @@ agentCommand
   .option("--wait", "poll until the run reaches a terminal status")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (query: string, options: AgentCreateOptions) => {
     const client = clientFor(options);
@@ -121,7 +120,6 @@ agentCommand
   .command("get")
   .description("Retrieve an agent run by ID.")
   .argument("<id>", "agent run ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options);
@@ -140,7 +138,6 @@ agentCommand
   .description("List agent runs.")
   .option("--cursor <cursor>", "pagination cursor")
   .option("--limit <count>", "number of runs to return", parseInteger)
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: AgentListOptions) => {
     const client = clientFor(options);
@@ -155,7 +152,6 @@ agentCommand
   .command("cancel")
   .description("Cancel a queued or running agent run.")
   .argument("<id>", "agent run ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options);
@@ -169,7 +165,6 @@ agentCommand
   .command("delete")
   .description("Delete a stored agent run.")
   .argument("<id>", "agent run ID")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options);
@@ -187,7 +182,6 @@ agentCommand
   .option("--limit <count>", "number of events to return", parseInteger)
   .option("--last-event-id <id>", "return only streamed events after this event ID")
   .option("--follow", "stream events as server-sent events")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: AgentEventOptions) => {
     const client = clientFor(options);

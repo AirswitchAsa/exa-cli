@@ -84,7 +84,6 @@ export const chatCommand = new Command("chat")
   .option("--behavior <json>", "behavior controls JSON object")
   .option("--stream", "stream server-sent chat completion chunks")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa API key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (prompt: string, options: ChatOptions) => {
     const client = clientFor(options);

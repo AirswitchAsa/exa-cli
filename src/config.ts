@@ -34,12 +34,10 @@ function readDotenvValue(name: string): string | undefined {
   return undefined;
 }
 
-export function resolveApiKey(override?: string): string {
-  const key = override ?? process.env.EXA_API_KEY ?? readDotenvValue("EXA_API_KEY");
+export function resolveApiKey(): string {
+  const key = process.env.EXA_API_KEY ?? readDotenvValue("EXA_API_KEY");
   if (key === undefined || key.length === 0) {
-    throw new Error(
-      "No Exa API key found. Pass --api-key <key>, set EXA_API_KEY, or add EXA_API_KEY to .env.",
-    );
+    throw new Error("No Exa API key found. Set EXA_API_KEY or add EXA_API_KEY to .env.");
   }
   return key;
 }

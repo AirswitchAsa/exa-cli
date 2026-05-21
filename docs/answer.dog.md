@@ -22,5 +22,5 @@ search results, together with the citations it relied on.
 ## Notes
 
 - Implemented in `src/commands/answer.ts`
-- Supports `--text`, `--stream`, `--output-schema`, `--api-key`, `--json`, and
+- Supports `--text`, `--stream`, `--output-schema`, `--json`, and
   `--body-json` for advanced request fields

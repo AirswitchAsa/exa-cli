@@ -54,7 +54,6 @@ keyCommand
   .option("--rate-limit <limit>", "request rate limit", parseInteger)
   .option("--budget-cents <cents>", "spending budget for the key, in cents", parseInteger)
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: KeyCreateOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);
@@ -66,7 +65,6 @@ keyCommand
   .command("get")
   .description("Retrieve an API key by ID.")
   .argument("<id>", "API key ID")
-  .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);
@@ -77,7 +75,6 @@ keyCommand
 keyCommand
   .command("list")
   .description("List API keys.")
-  .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);
@@ -94,7 +91,6 @@ keyCommand
   .option("--budget-cents <cents>", "spending budget for the key, in cents", parseInteger)
   .option("--clear-budget", "remove the spending budget")
   .option("--body-json <json>", "merge raw JSON request fields")
-  .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: KeyUpdateOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);
@@ -106,7 +102,6 @@ keyCommand
   .command("delete")
   .description("Delete an API key.")
   .argument("<id>", "API key ID")
-  .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);
@@ -121,7 +116,6 @@ keyCommand
   .option("--start-date <date>", "usage start date")
   .option("--end-date <date>", "usage end date")
   .option("--group-by <unit>", "usage granularity: hour, day, month")
-  .option("--api-key <key>", "Exa service key (overrides EXA_API_KEY)")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: KeyUsageOptions) => {
     const client = clientFor(options, TEAM_BASE_URL);

@@ -15,7 +15,7 @@ cover the main request surface: `--num-results`, `--type`, `--category`,
 date filters, `--user-location`, `--compliance`, `--moderation`, content
 requests (`--text`, `--highlights`, `--summary`), synthesized output controls
 (`--output-schema`, `--system-prompt`), `--stream`, `--body-json`,
-`--api-key`, and `--json`.
+and `--json`.
 
 Comma-separated list flags are split into arrays. Content flags send a
 `contents` object in the request body. `--body-json` remains available for
