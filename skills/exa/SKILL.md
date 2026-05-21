@@ -10,8 +10,7 @@ metadata:
 Run Exa-backed web search and content extraction through the `exa` CLI,
 instead of running the Exa MCP server.
 
-> Status: work in progress. `exa search` is implemented; `answer` and
-> `contents` are scaffolded and not yet wired up.
+> Status: `exa search`, `exa answer`, and `exa contents` are implemented.
 
 ## When to fire
 
@@ -24,8 +23,8 @@ content rather than raw HTML.
 ```bash
 exa search "<query>" --num-results 5 --json
 exa search "<query>" --text --json
-exa answer "<question>" --json      # not yet implemented
-exa contents <url> --json           # not yet implemented
+exa answer "<question>" --json
+exa contents <url> --json
 ```
 
 Pass `--json` to consume structured output; omit it for human-readable text.

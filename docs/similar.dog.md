@@ -20,5 +20,5 @@ API key through `#ConfigResolver` and uses `#ExaClient` to POST to the Exa
 
 ## Notes
 
-- Scaffolded; not yet implemented
+- Implemented in `src/commands/similar.ts`
 - Shares result formatting with `!Search`

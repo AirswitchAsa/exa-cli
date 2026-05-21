@@ -20,5 +20,6 @@ search results, together with the citations it relied on.
 
 ## Notes
 
-- Scaffolded; not yet implemented
-- Planned flags: `--type`, `--api-key`, `--json`
+- Implemented in `src/commands/answer.ts`
+- Supports `--text`, `--output-schema`, `--api-key`, `--json`, and
+  `--body-json` for advanced request fields
