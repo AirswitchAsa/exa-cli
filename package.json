@@ -1,6 +1,6 @@
 {
   "name": "@spicadust/exa-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Unofficial command-line interface for the Exa API. Not affiliated with Exa.",
   "type": "module",
   "bin": {
