@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import type { Command } from "commander";
 import { agentCommand } from "../src/commands/agent.js";
 import { answerCommand } from "../src/commands/answer.js";
+import { apiKeyCommand } from "../src/commands/api-key.js";
 import { chatCommand } from "../src/commands/chat.js";
+import { configCommand } from "../src/commands/config.js";
 import { contentsCommand } from "../src/commands/contents.js";
 import { contextCommand } from "../src/commands/context.js";
 import { keyCommand } from "../src/commands/key.js";
@@ -13,10 +18,28 @@ import { responseCommand } from "../src/commands/response.js";
 import { searchCommand } from "../src/commands/search.js";
 import { similarCommand } from "../src/commands/similar.js";
 import { websetCommand } from "../src/commands/webset.js";
+import { configPath, readUserConfig } from "../src/config.js";
 import { assertHeader, runCommand, withMockFetch } from "./helpers.js";
 
 function allCommands(command: Command): Command[] {
   return [command, ...command.commands.flatMap((child) => allCommands(child))];
+}
+
+async function withTempConfig(run: () => Promise<void>): Promise<void> {
+  const previousConfigDir = process.env.EXA_CONFIG_DIR;
+  const dir = mkdtempSync(join(tmpdir(), "exa-cli-command-config-"));
+  process.env.EXA_CONFIG_DIR = dir;
+
+  try {
+    await run();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    if (previousConfigDir === undefined) {
+      delete process.env.EXA_CONFIG_DIR;
+    } else {
+      process.env.EXA_CONFIG_DIR = previousConfigDir;
+    }
+  }
 }
 
 test("commands do not expose API keys as flags", () => {
@@ -33,6 +56,8 @@ test("commands do not expose API keys as flags", () => {
     monitorCommand,
     websetCommand,
     keyCommand,
+    apiKeyCommand,
+    configCommand,
   ].flatMap((command) => allCommands(command));
 
   for (const command of commands) {
@@ -41,6 +66,26 @@ test("commands do not expose API keys as flags", () => {
       false,
     );
   }
+});
+
+test("config command stores non-secret preferences in user config", async () => {
+  await withTempConfig(async () => {
+    await runCommand(configCommand, ["set", "output", "json"]);
+    assert.deepEqual(readUserConfig().preferences, { output: "json" });
+
+    await runCommand(configCommand, ["set", "limit", "5"]);
+    assert.deepEqual(readUserConfig().preferences, { output: "json", limit: 5 });
+
+    await runCommand(configCommand, ["unset", "output"]);
+    assert.deepEqual(readUserConfig().preferences, { limit: 5 });
+    assert.match(configPath(), /config\.json$/);
+  });
+});
+
+test("api-key status does not require or print the API key", async () => {
+  await withTempConfig(async () => {
+    await runCommand(apiKeyCommand, ["status"]);
+  });
 });
 
 test("search maps rich filters to /search", async () => {

@@ -34,9 +34,10 @@ Pass `--json` to consume structured output; omit it for human-readable text.
 
 ## Configuration
 
-The CLI reads `EXA_API_KEY` from the environment or a current-directory `.env`
-file. It deliberately does not expose an API-key command flag. Never type an
-API key into a command yourself.
+The CLI reads `EXA_API_KEY` from the environment, a current-directory `.env`
+file, or a stored key in `~/.exa/config.json` created by `exa api-key set`.
+It deliberately does not expose an API-key command flag. Never type an API key
+into a command yourself.
 
 ## Exit codes
 

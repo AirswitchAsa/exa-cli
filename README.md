@@ -26,12 +26,14 @@ Requires Node.js 20 or newer.
 ## Authentication
 
 The CLI resolves credentials from `EXA_API_KEY` in the environment, then
-`EXA_API_KEY` in a current-directory `.env` file. It intentionally does not
-accept API keys as command-line flags, so secrets do not land in shell history
-or process listings.
+`EXA_API_KEY` in a current-directory `.env` file, then a stored key in
+`~/.exa/config.json`. It intentionally does not accept API keys as command-line
+flags, so secrets do not land in shell history or process listings.
 
 ```bash
 export EXA_API_KEY=...   # get a key at https://exa.ai
+exa api-key set          # store a reusable key locally
+exa api-key status
 ```
 
 ## Usage
@@ -61,6 +63,8 @@ Target coverage is the full Exa REST API:
 | `monitor`  | `create` · `get` · `list` · `update` · `delete` · `trigger` · `runs` · `batch` |
 | `webset`   | `create` · `get` · `list` · `update` · `delete` · `cancel` · `preview` · `search` · `items` · `enrich` · `export` · `import` · `webhook` · `events` · `monitor` · `team` |
 | `key`      | `create` · `get` · `list` · `update` · `delete` · `usage`       |
+| `api-key`  | `set` · `status` · `unset`                                      |
+| `config`   | `path` · `list` · `get` · `set` · `unset`                       |
 
 ## Design reference
 

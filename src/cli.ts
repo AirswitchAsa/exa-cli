@@ -3,7 +3,9 @@ import { Command } from "commander";
 import { ExaError } from "./client.js";
 import { agentCommand } from "./commands/agent.js";
 import { answerCommand } from "./commands/answer.js";
+import { apiKeyCommand } from "./commands/api-key.js";
 import { chatCommand } from "./commands/chat.js";
+import { configCommand } from "./commands/config.js";
 import { contentsCommand } from "./commands/contents.js";
 import { contextCommand } from "./commands/context.js";
 import { keyCommand } from "./commands/key.js";
@@ -32,6 +34,8 @@ for (const command of [
   monitorCommand,
   websetCommand,
   keyCommand,
+  apiKeyCommand,
+  configCommand,
 ]) {
   program.addCommand(command);
 }
