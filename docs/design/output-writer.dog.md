@@ -19,6 +19,7 @@ separation lets the `@User` compose `exa` commands in shell pipelines.
 
 ## Notes
 
-- Source: `src/output.ts`
+- Source: `src/output.ts`; streaming render in `src/commands/_shared.ts`
 - `printJson` pretty-prints with two-space indentation
+- Streamed server-sent events are parsed, not dumped raw: text deltas render as flowing text, structured events as one JSON object per line
 - Keeping content on stdout and noise on stderr is a deliberate design rule

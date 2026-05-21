@@ -44,6 +44,17 @@ than hanging if the task never reaches a terminal status. `agent events`
 accepts `--follow` to stream events as they arrive. The polling pattern is
 defined once and reused across groups.
 
+## Network resilience
+
+Every request flows through the `ExaClient` component, which makes transient
+failures the client's problem rather than each command's. Each request is
+bounded by a timeout, and rate-limit (`429`) and server (`5xx`) responses —
+along with network errors and timeouts — are retried with exponential backoff
+and jitter, honoring a `Retry-After` header when the server sends one. Other
+`4xx` responses are not retried; they surface immediately as `&ExaError`.
+Streaming requests apply the timeout to connecting and receiving headers, then
+let the event stream itself run unbounded.
+
 ## Exit codes
 
 - `0` — success

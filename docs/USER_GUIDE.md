@@ -86,7 +86,12 @@ These rules hold across every command — they are specified once in
 - **`--json`** — every non-streaming command accepts `--json` for the raw API
   response. Without it, the command prints a human-readable rendering.
 - **`--stream` / `--follow`** — commands backed by server-sent event endpoints
-  stream the event feed straight to stdout.
+  render the event feed to stdout: text deltas as flowing text, structured
+  events as one JSON object per line.
+- **Timeouts and retries** — every request is bounded by a timeout, and
+  rate-limit (`429`) and server (`5xx`) responses are retried automatically
+  with exponential backoff. No flags needed; transient failures are handled
+  before a command ever fails.
 - **`--body-json '<json>'`** — an escape hatch on every request-shaping
   command. The JSON object is merged into the request body, so new or uncommon
   Exa fields are reachable before the CLI grows a dedicated flag.

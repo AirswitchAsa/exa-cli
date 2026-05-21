@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import pkg from "../package.json" with { type: "json" };
 import { ExaError } from "./client.js";
 import { agentCommand } from "./commands/agent.js";
 import { answerCommand } from "./commands/answer.js";
@@ -25,7 +26,8 @@ program
     "Unofficial command-line interface for the Exa API. " +
       "An independent project, not affiliated with or endorsed by Exa.",
   )
-  .version("0.0.1");
+  // Single source of truth for the version — package.json, imported directly.
+  .version(pkg.version);
 
 for (const command of [
   searchCommand,

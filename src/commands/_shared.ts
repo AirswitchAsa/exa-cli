@@ -229,14 +229,95 @@ export function encodePath(value: string): string {
   return encodeURIComponent(value);
 }
 
+/**
+ * Pull a human-readable text delta out of a parsed SSE event, covering the
+ * envelope shapes Exa's streaming endpoints use:
+ *  - OpenAI chat-completion chunks: `choices[0].delta.content` (or `.text`)
+ *  - OpenAI Responses-API events: `{ type: "*.delta", delta: "..." }`
+ * Returns undefined for events with no text payload (e.g. research/agent
+ * progress events), so the caller can render those differently.
+ */
+export function extractDeltaText(event: unknown): string | undefined {
+  if (event === null || typeof event !== "object") return undefined;
+  const record = event as JsonObject;
+
+  const choices = record.choices;
+  if (Array.isArray(choices) && choices.length > 0 && typeof choices[0] === "object") {
+    const choice = choices[0] as JsonObject;
+    const delta = choice.delta;
+    if (delta !== null && typeof delta === "object") {
+      const content = (delta as JsonObject).content;
+      if (typeof content === "string") return content;
+    }
+    if (typeof choice.text === "string") return choice.text;
+  }
+
+  if (typeof record.type === "string" && record.type.endsWith(".delta")) {
+    if (typeof record.delta === "string") return record.delta;
+  }
+
+  return undefined;
+}
+
+/**
+ * Render a server-sent event stream. Rather than dumping raw bytes, this parses
+ * the SSE envelope: text deltas stream out as flowing text, while structured
+ * events (no text payload) print one compact JSON object per line. Non-JSON
+ * `data:` payloads pass through verbatim.
+ */
 export async function printStream(stream: ReadableStream<Uint8Array>): Promise<void> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
+  let buffer = "";
+  let wroteText = false;
+
+  const handleEvent = (block: string): void => {
+    const dataLines: string[] = [];
+    for (const line of block.split("\n")) {
+      if (line.startsWith(":")) continue; // SSE comment
+      if (line.startsWith("data:")) dataLines.push(line.slice(5).replace(/^ /, ""));
+    }
+    if (dataLines.length === 0) return;
+
+    const data = dataLines.join("\n");
+    if (data === "[DONE]") return;
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      process.stdout.write(`${data}\n`);
+      return;
+    }
+
+    const text = extractDeltaText(parsed);
+    if (text !== undefined) {
+      process.stdout.write(text);
+      wroteText = true;
+    } else {
+      process.stdout.write(`${JSON.stringify(parsed)}\n`);
+    }
+  };
+
+  const drain = (): void => {
+    let separator = buffer.indexOf("\n\n");
+    while (separator !== -1) {
+      handleEvent(buffer.slice(0, separator));
+      buffer = buffer.slice(separator + 2);
+      separator = buffer.indexOf("\n\n");
+    }
+  };
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    process.stdout.write(decoder.decode(value, { stream: true }));
+    buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
+    drain();
   }
-  process.stdout.write(decoder.decode());
+  buffer += decoder.decode().replace(/\r\n/g, "\n");
+  drain();
+  if (buffer.trim().length > 0) handleEvent(buffer);
+
+  // Text deltas are written without trailing newlines; end the line cleanly.
+  if (wroteText) process.stdout.write("\n");
 }

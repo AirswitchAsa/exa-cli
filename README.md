@@ -73,7 +73,7 @@ human-readable text. `exa --help` lists every command.
   [DOG](https://github.com/AirswitchAsa/dog) specs: the source of truth for
   actors, behaviors, components, and data.
 - **[Conventions](docs/conventions.md)** — cross-cutting CLI design rules.
-- **[Claude Code skill](skills/exa/)** — wraps the CLI for agent workflows.
+- **[Agent skill](skills/exa/)** — wraps the CLI for agent workflows.
 
 ## Commands
 
