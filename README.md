@@ -68,9 +68,10 @@ human-readable text. `exa --help` lists every command.
 
 - **[User guide](docs/USER_GUIDE.md)** — install, authentication, and the full
   command reference with examples and links to the matching Exa docs.
-- **[Design reference](docs/index.dog.md)** — the behavioral specification.
-  The `.dog.md` files are [DOG](https://github.com/AirswitchAsa/dog) specs:
-  the source of truth for actors, behaviors, components, and data.
+- **[Design reference](docs/design/index.dog.md)** — the behavioral
+  specification. The `.dog.md` files in `docs/design/` are
+  [DOG](https://github.com/AirswitchAsa/dog) specs: the source of truth for
+  actors, behaviors, components, and data.
 - **[Conventions](docs/conventions.md)** — cross-cutting CLI design rules.
 - **[Claude Code skill](skills/exa/)** — wraps the CLI for agent workflows.
 

@@ -1,8 +1,8 @@
 # CLI conventions
 
-Cross-cutting design rules for `exa-cli`. The `.dog.md` specs in this
-directory describe individual behaviors and components; this document
-records the conventions that apply across all of them.
+Cross-cutting design rules for `exa-cli`. The `.dog.md` specs in
+[`design/`](design/) describe individual behaviors and components; this
+document records the conventions that apply across all of them.
 
 ## Command structure
 
@@ -58,6 +58,6 @@ The CLI ships two ways. The primary channel is an npm package with a single
 `exa` binary, targeting Node.js 20 or newer. The secondary channel is a
 standalone executable built with `bun build --compile`, which embeds the
 runtime so it needs neither Node.js nor an npm install. Tagged `v*` releases
-publish the npm package and attach cross-compiled Bun binaries (macOS and
-Linux, arm64 and x64) as GitHub release assets. See `docs/USER_GUIDE.md` for
-install instructions and `.github/workflows/release.yml` for the pipeline.
+publish the npm package and attach Bun binaries (macOS arm64, Linux x64 and
+arm64, Windows x64) as GitHub release assets. See `USER_GUIDE.md` for install
+instructions and `.github/workflows/release.yml` for the pipeline.
