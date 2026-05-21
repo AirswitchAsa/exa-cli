@@ -134,7 +134,7 @@ monitorCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: MonitorCreateOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.post<unknown>("/monitors", createBody(options));
     printMaybeJson(response, options.json);
   });
@@ -145,7 +145,7 @@ monitorCommand
   .argument("<id>", "monitor ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.get<unknown>(`/monitors/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -160,7 +160,7 @@ monitorCommand
   .option("--metadata <json>", "metadata filters encoded as JSON")
   .option("--json", "print the raw JSON response")
   .action(async (options: MonitorListOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     let metadata: JsonObject | undefined;
     if (options.metadata !== undefined) {
       metadata = {};
@@ -198,7 +198,7 @@ monitorCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: MonitorUpdateOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.patch<unknown>(
       `/monitors/${encodePath(id)}`,
       updateBody(options),
@@ -212,7 +212,7 @@ monitorCommand
   .argument("<id>", "monitor ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.delete<unknown>(`/monitors/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -223,7 +223,7 @@ monitorCommand
   .argument("<id>", "monitor ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.post<unknown>(`/monitors/${encodePath(id)}/trigger`);
     printMaybeJson(response, options.json);
   });
@@ -237,7 +237,7 @@ monitorCommand
   .option("--limit <count>", "number of runs to return", parseInteger)
   .option("--json", "print the raw JSON response")
   .action(async (id: string, runId: string | undefined, options: MonitorRunsOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const path =
       runId === undefined
         ? `/monitors/${encodePath(id)}/runs`
@@ -254,7 +254,7 @@ monitorCommand
   .requiredOption("--body-json <json>", "batch request JSON body")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions & { bodyJson: string }) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.post<unknown>(
       "/monitors/batch",
       parseJsonObject(options.bodyJson, "--body-json"),

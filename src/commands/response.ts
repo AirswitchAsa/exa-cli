@@ -25,6 +25,7 @@ interface ResponseCreateOptions extends CommonOptions {
   stream?: boolean;
   wait?: boolean;
   pollInterval?: number;
+  timeout?: number;
   bodyJson?: string;
 }
 
@@ -80,10 +81,11 @@ responseCommand
   .option("--stream", "stream server-sent response events")
   .option("--wait", "poll until the response reaches a terminal status")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
+  .option("--timeout <ms>", "maximum milliseconds to wait for --wait", parseInteger, 600000)
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (input: string, options: ResponseCreateOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = { input, model: options.model ?? "exa-research" };
     addIfDefined(body, "instructions", options.instructions);
     addIfDefined(body, "stream", options.stream);
@@ -107,6 +109,7 @@ responseCommand
         (value) => getString(value, "status"),
         () => client.get<OpenAIResponse>(`/responses/${encodePath(id)}`),
         options.pollInterval ?? 2000,
+        options.timeout ?? 600000,
       );
     }
 
@@ -124,7 +127,7 @@ responseCommand
   .option("--stream", "stream response events when supported")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ResponseGetOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const path = `/responses/${encodePath(id)}`;
     if (options.stream === true) {
       const stream = await client.stream(path, {

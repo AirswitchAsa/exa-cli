@@ -124,7 +124,7 @@ function printContents(response: ContentsResponse): void {
 
 export const contentsCommand = new Command("contents")
   .description("Fetch clean page contents for one or more URLs.")
-  .argument("[urls...]", "URLs to fetch; newline-delimited URLs may also be read from stdin")
+  .argument("[urls...]", "URLs to fetch; if omitted, newline-delimited URLs are read from stdin")
   .option("--max-characters <count>", "maximum returned text characters", parseInteger)
   .option("--include-html-tags", "include HTML tags in extracted text")
   .option("--verbosity <level>", "text verbosity: compact, standard, full")
@@ -146,13 +146,12 @@ export const contentsCommand = new Command("contents")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (urls: string[], options: ContentsOptions) => {
-    const stdinUrls = await readStdinLines();
-    const allUrls = [...urls, ...stdinUrls];
+    const allUrls = urls.length > 0 ? urls : await readStdinLines();
     if (allUrls.length === 0) {
       throw new Error("Provide at least one URL argument or newline-delimited URLs on stdin.");
     }
 
-    const client = clientFor(options);
+    const client = clientFor();
     const body = mergeBodyJson({ urls: allUrls, ...contentOptions(options) }, options.bodyJson);
     const response = await client.post<ContentsResponse>("/contents", body);
 

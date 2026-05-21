@@ -56,7 +56,7 @@ keyCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: KeyCreateOptions) => {
-    const client = clientFor(options, TEAM_BASE_URL);
+    const client = clientFor(TEAM_BASE_URL);
     const response = await client.post<unknown>("/api-keys", bodyFrom(options));
     printMaybeJson(response, options.json);
   });
@@ -67,7 +67,7 @@ keyCommand
   .argument("<id>", "API key ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options, TEAM_BASE_URL);
+    const client = clientFor(TEAM_BASE_URL);
     const response = await client.get<unknown>(`/api-keys/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -77,7 +77,7 @@ keyCommand
   .description("List API keys.")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions) => {
-    const client = clientFor(options, TEAM_BASE_URL);
+    const client = clientFor(TEAM_BASE_URL);
     const response = await client.get<unknown>("/api-keys");
     printMaybeJson(response, options.json, true);
   });
@@ -93,7 +93,7 @@ keyCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: KeyUpdateOptions) => {
-    const client = clientFor(options, TEAM_BASE_URL);
+    const client = clientFor(TEAM_BASE_URL);
     const response = await client.put<unknown>(`/api-keys/${encodePath(id)}`, bodyFrom(options));
     printMaybeJson(response, options.json);
   });
@@ -104,7 +104,7 @@ keyCommand
   .argument("<id>", "API key ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options, TEAM_BASE_URL);
+    const client = clientFor(TEAM_BASE_URL);
     const response = await client.delete<unknown>(`/api-keys/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -118,7 +118,7 @@ keyCommand
   .option("--group-by <unit>", "usage granularity: hour, day, month")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: KeyUsageOptions) => {
-    const client = clientFor(options, TEAM_BASE_URL);
+    const client = clientFor(TEAM_BASE_URL);
     const response = await client.get<unknown>(`/api-keys/${encodePath(id)}/usage`, {
       query: {
         start_date: options.startDate,

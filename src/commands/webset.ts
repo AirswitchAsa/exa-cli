@@ -31,6 +31,7 @@ interface WebsetCreateOptions extends CommonOptions {
   excludeJson?: string[];
   wait?: boolean;
   pollInterval?: number;
+  timeout?: number;
   bodyJson?: string;
 }
 
@@ -143,8 +144,8 @@ function parseJsonArray(values: string[] | undefined, label: string): unknown[] 
   return values?.map((value) => parseJson(value, label));
 }
 
-function websetClient(options: CommonOptions) {
-  return clientFor(options, WEBSETS_BASE_URL);
+function websetClient() {
+  return clientFor(WEBSETS_BASE_URL);
 }
 
 function websetBody(options: WebsetCreateOptions): JsonObject {
@@ -253,10 +254,11 @@ websetCommand
   .option("--exclude-json <json>", "global exclusion source object; repeatable", collect)
   .option("--wait", "poll until the webset reaches idle")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
+  .option("--timeout <ms>", "maximum milliseconds to wait for --wait", parseInteger, 600000)
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetCreateOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     let response = await client.post<JsonObject>("/v0/websets", websetBody(options));
     if (options.wait === true) {
       const id = getString(response, "id");
@@ -266,6 +268,7 @@ websetCommand
         (value) => getString(value, "status"),
         () => client.get<JsonObject>(`/v0/websets/${encodePath(id)}`),
         options.pollInterval ?? 2000,
+        options.timeout ?? 600000,
       );
     }
     printMaybeJson(response, options.json);
@@ -278,7 +281,7 @@ websetCommand
   .option("--expand <values>", "comma-separated resources to expand, such as items")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebsetGetOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/websets/${encodePath(id)}`, {
       query: { expand: options.expand },
     });
@@ -293,7 +296,7 @@ websetCommand
   .option("--search <term>", "filter by ID, external ID, or title")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetListOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>("/v0/websets", {
       query: { cursor: options.cursor, limit: options.limit, search: options.search },
     });
@@ -310,7 +313,7 @@ websetCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebsetUpdateOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>(
       `/v0/websets/${encodePath(id)}`,
       updateBody(options),
@@ -324,7 +327,7 @@ websetCommand
   .argument("<id>", "webset ID or external ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.delete<unknown>(`/v0/websets/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -335,7 +338,7 @@ websetCommand
   .argument("<id>", "webset ID or external ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>(`/v0/websets/${encodePath(id)}/cancel`);
     printMaybeJson(response, options.json);
   });
@@ -349,7 +352,7 @@ websetCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetPreviewOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const body = mergeBodyJson(
       {
         search: {
@@ -379,7 +382,7 @@ searchCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: SearchOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const body = mergeBodyJson(
       {
         ...(options.query !== undefined ? { query: options.query } : {}),
@@ -399,7 +402,7 @@ searchCommand
   .argument("<id>", "search ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(
       `/v0/websets/${encodePath(webset)}/searches/${encodePath(id)}`,
     );
@@ -413,7 +416,7 @@ searchCommand
   .argument("<id>", "search ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>(
       `/v0/websets/${encodePath(webset)}/searches/${encodePath(id)}/cancel`,
     );
@@ -433,7 +436,7 @@ itemsCommand
   .option("--source-id <id>", "source ID filter")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: PageOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/websets/${encodePath(webset)}/items`, {
       query: { cursor: options.cursor, limit: options.limit, sourceId: options.sourceId },
     });
@@ -447,7 +450,7 @@ itemsCommand
   .argument("<id>", "item ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(
       `/v0/websets/${encodePath(webset)}/items/${encodePath(id)}`,
     );
@@ -461,7 +464,7 @@ itemsCommand
   .argument("<id>", "item ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.delete<unknown>(
       `/v0/websets/${encodePath(webset)}/items/${encodePath(id)}`,
     );
@@ -481,7 +484,7 @@ enrichCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: EnrichmentOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>(
       `/v0/websets/${encodePath(webset)}/enrichments`,
       enrichmentBody(options),
@@ -496,7 +499,7 @@ enrichCommand
   .argument("<id>", "enrichment ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(
       `/v0/websets/${encodePath(webset)}/enrichments/${encodePath(id)}`,
     );
@@ -516,7 +519,7 @@ enrichCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: EnrichmentOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.patch<unknown>(
       `/v0/websets/${encodePath(webset)}/enrichments/${encodePath(id)}`,
       enrichmentBody(options),
@@ -531,7 +534,7 @@ enrichCommand
   .argument("<id>", "enrichment ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.delete<unknown>(
       `/v0/websets/${encodePath(webset)}/enrichments/${encodePath(id)}`,
     );
@@ -545,7 +548,7 @@ enrichCommand
   .argument("<id>", "enrichment ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>(
       `/v0/websets/${encodePath(webset)}/enrichments/${encodePath(id)}/cancel`,
     );
@@ -567,7 +570,7 @@ importCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: ImportCreateOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const body: JsonObject = {};
     addIfDefined(body, "size", options.size);
     addIfDefined(body, "count", options.count);
@@ -591,7 +594,7 @@ importCommand
   .option("--limit <count>", "number of imports to return", parseInteger)
   .option("--json", "print the raw JSON response")
   .action(async (options: PageOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>("/v0/imports", {
       query: { cursor: options.cursor, limit: options.limit },
     });
@@ -604,7 +607,7 @@ importCommand
   .argument("<id>", "import ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/imports/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -618,7 +621,7 @@ importCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ImportUpdateOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const body: JsonObject = {};
     addIfDefined(body, "title", options.title);
     if (options.metadata !== undefined)
@@ -636,7 +639,7 @@ importCommand
   .argument("<id>", "import ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.delete<unknown>(`/v0/imports/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -652,7 +655,7 @@ webhookCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebhookOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>("/v0/webhooks", webhookBody(options));
     printMaybeJson(response, options.json);
   });
@@ -664,7 +667,7 @@ webhookCommand
   .option("--limit <count>", "number of webhooks to return", parseInteger)
   .option("--json", "print the raw JSON response")
   .action(async (options: PageOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>("/v0/webhooks", {
       query: { cursor: options.cursor, limit: options.limit },
     });
@@ -677,7 +680,7 @@ webhookCommand
   .argument("<id>", "webhook ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/webhooks/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -693,7 +696,7 @@ webhookCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebhookOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.patch<unknown>(
       `/v0/webhooks/${encodePath(id)}`,
       webhookBody(options),
@@ -707,7 +710,7 @@ webhookCommand
   .argument("<id>", "webhook ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.delete<unknown>(`/v0/webhooks/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -722,7 +725,7 @@ webhookCommand
   .option("--successful <true|false>", "filter by delivery success", parseBoolean)
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebhookAttemptOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/webhooks/${encodePath(id)}/attempts`, {
       query: {
         cursor: options.cursor,
@@ -748,7 +751,7 @@ eventsCommand
   .option("--created-after <date>", "only events created after this ISO datetime")
   .option("--json", "print the raw JSON response")
   .action(async (options: EventListOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>("/v0/events", {
       query: {
         cursor: options.cursor,
@@ -767,7 +770,7 @@ eventsCommand
   .argument("<id>", "event ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/events/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -787,7 +790,7 @@ websetMonitorCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (options: WebsetMonitorOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.post<unknown>("/v0/monitors", websetMonitorBody(options));
     printMaybeJson(response, options.json);
   });
@@ -800,7 +803,7 @@ websetMonitorCommand
   .option("--webset-id <id>", "webset ID filter")
   .option("--json", "print the raw JSON response")
   .action(async (options: PageOptions & { websetId?: string }) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>("/v0/monitors", {
       query: {
         cursor: options.cursor,
@@ -817,7 +820,7 @@ websetMonitorCommand
   .argument("<id>", "monitor ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(`/v0/monitors/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -834,7 +837,7 @@ websetMonitorCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: WebsetMonitorOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.patch<unknown>(
       `/v0/monitors/${encodePath(id)}`,
       websetMonitorBody(options),
@@ -848,7 +851,7 @@ websetMonitorCommand
   .argument("<id>", "monitor ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.delete<unknown>(`/v0/monitors/${encodePath(id)}`);
     printMaybeJson(response, options.json);
   });
@@ -860,7 +863,7 @@ websetMonitorCommand
   .argument("[id]", "run ID")
   .option("--json", "print the raw JSON response")
   .action(async (monitor: string, id: string | undefined, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const path =
       id === undefined
         ? `/v0/monitors/${encodePath(monitor)}/runs`
@@ -874,7 +877,7 @@ websetCommand
   .description("Show the authenticated Websets team.")
   .option("--json", "print the raw JSON response")
   .action(async (options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>("/v0/teams/me");
     printMaybeJson(response, options.json);
   });
@@ -890,7 +893,7 @@ exportCommand
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, options: ExportOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const body = mergeBodyJson(
       { ...(options.format !== undefined ? { format: options.format } : {}) },
       options.bodyJson,
@@ -906,7 +909,7 @@ exportCommand
   .argument("<id>", "export ID")
   .option("--json", "print the raw JSON response")
   .action(async (webset: string, id: string, options: CommonOptions) => {
-    const client = websetClient(options);
+    const client = websetClient();
     const response = await client.get<unknown>(
       `/v0/websets/${encodePath(webset)}/exports/${encodePath(id)}`,
     );

@@ -60,6 +60,17 @@ export class ExaClient {
     };
   }
 
+  async #buildError(response: Response): Promise<ExaError> {
+    const raw = await response.text();
+    let payload: unknown;
+    try {
+      payload = raw.length > 0 ? JSON.parse(raw) : undefined;
+    } catch {
+      payload = raw;
+    }
+    return new ExaError(response.status, payload);
+  }
+
   async request<T>(
     method: string,
     path: string,
@@ -72,42 +83,17 @@ export class ExaClient {
       body: body === undefined ? undefined : JSON.stringify(body),
     });
 
+    if (!response.ok) {
+      throw await this.#buildError(response);
+    }
+
     const raw = await response.text();
-    let payload: unknown;
+    if (raw.length === 0) return undefined as T;
     try {
-      payload = raw.length > 0 ? JSON.parse(raw) : undefined;
+      return JSON.parse(raw) as T;
     } catch {
-      payload = raw;
+      return raw as T;
     }
-
-    if (!response.ok) {
-      throw new ExaError(response.status, payload);
-    }
-    return payload as T;
-  }
-
-  async stream(path: string, options: RequestOptions = {}): Promise<ReadableStream<Uint8Array>> {
-    const response = await fetch(this.#url(path, options.query), {
-      method: "GET",
-      headers: this.#headers(options.headers),
-    });
-
-    if (!response.ok) {
-      const raw = await response.text();
-      let payload: unknown;
-      try {
-        payload = raw.length > 0 ? JSON.parse(raw) : undefined;
-      } catch {
-        payload = raw;
-      }
-      throw new ExaError(response.status, payload);
-    }
-
-    if (response.body === null) {
-      throw new Error("Exa API returned an empty stream.");
-    }
-
-    return response.body;
   }
 
   async requestStream(
@@ -123,14 +109,7 @@ export class ExaClient {
     });
 
     if (!response.ok) {
-      const raw = await response.text();
-      let payload: unknown;
-      try {
-        payload = raw.length > 0 ? JSON.parse(raw) : undefined;
-      } catch {
-        payload = raw;
-      }
-      throw new ExaError(response.status, payload);
+      throw await this.#buildError(response);
     }
 
     if (response.body === null) {
@@ -138,6 +117,10 @@ export class ExaClient {
     }
 
     return response.body;
+  }
+
+  stream(path: string, options: RequestOptions = {}): Promise<ReadableStream<Uint8Array>> {
+    return this.requestStream("GET", path, undefined, options);
   }
 
   post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {

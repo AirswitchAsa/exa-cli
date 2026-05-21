@@ -19,6 +19,7 @@ interface ResearchCreateOptions extends CommonOptions {
   outputSchema?: string;
   wait?: boolean;
   pollInterval?: number;
+  timeout?: number;
   bodyJson?: string;
 }
 
@@ -71,10 +72,11 @@ researchCommand
   .option("--output-schema <json>", "JSON schema for structured research output")
   .option("--wait", "poll until the task reaches a terminal status")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
+  .option("--timeout <ms>", "maximum milliseconds to wait for --wait", parseInteger, 600000)
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (instructions: string, options: ResearchCreateOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = { instructions };
     addIfDefined(body, "model", options.model);
     if (options.outputSchema !== undefined) {
@@ -96,6 +98,7 @@ researchCommand
             query: { events: true },
           }),
         options.pollInterval ?? 2000,
+        options.timeout ?? 600000,
       );
     }
 
@@ -113,7 +116,7 @@ researchCommand
   .option("--events", "include the detailed event log")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: ResearchGetOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const task = await client.get<ResearchTask>(`${RESEARCH_PATH}/${encodePath(id)}`, {
       query: { events: options.events },
     });
@@ -132,7 +135,7 @@ researchCommand
   .option("--limit <count>", "number of tasks to return, 1-50", parseInteger)
   .option("--json", "print the raw JSON response")
   .action(async (options: ResearchListOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.get<unknown>(RESEARCH_PATH, {
       query: { cursor: options.cursor, limit: options.limit },
     });

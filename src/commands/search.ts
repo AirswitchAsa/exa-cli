@@ -41,6 +41,8 @@ interface SearchResult {
   publishedDate?: string;
   author?: string;
   text?: string;
+  highlights?: string[];
+  summary?: string;
 }
 
 interface SearchResponse {
@@ -75,7 +77,7 @@ export const searchCommand = new Command("search")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (query: string, options: SearchOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
 
     const body: JsonObject = { query };
     addIfDefined(body, "numResults", options.numResults);
@@ -131,6 +133,16 @@ export const searchCommand = new Command("search")
       printLine(`${index + 1}. ${result.title ?? "(untitled)"}`);
       printLine(`   ${result.url}`);
       if (result.publishedDate !== undefined) printLine(`   ${result.publishedDate}`);
+      if (result.summary !== undefined) {
+        printLine();
+        printLine(`   summary: ${result.summary.replace(/\s+/g, " ").trim()}`);
+      }
+      if (result.highlights !== undefined && result.highlights.length > 0) {
+        printLine();
+        for (const highlight of result.highlights) {
+          printLine(`   - ${highlight.replace(/\s+/g, " ").trim()}`);
+        }
+      }
       if (result.text !== undefined) {
         printLine();
         printLine(`   ${result.text.slice(0, 600).replace(/\s+/g, " ").trim()}`);

@@ -26,7 +26,7 @@ export const contextCommand = new Command("context")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (query: string, options: ContextOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = {
       query,
       tokensNum: options.dynamic === true ? "dynamic" : (options.tokens ?? 4096),

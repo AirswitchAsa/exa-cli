@@ -86,7 +86,7 @@ export const chatCommand = new Command("chat")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (prompt: string, options: ChatOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = { messages: messagesFrom(prompt, options) };
     addIfDefined(body, "model", options.model);
     addIfDefined(body, "query", options.query);

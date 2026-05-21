@@ -52,7 +52,7 @@ export const answerCommand = new Command("answer")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (question: string, options: AnswerOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = { query: question };
     addIfDefined(body, "text", options.text);
     addIfDefined(body, "stream", options.stream);

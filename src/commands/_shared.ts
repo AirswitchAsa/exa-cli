@@ -8,7 +8,7 @@ export interface CommonOptions {
 
 export type JsonObject = Record<string, unknown>;
 
-export function clientFor(_options: CommonOptions, baseUrl?: string): ExaClient {
+export function clientFor(baseUrl?: string): ExaClient {
   return new ExaClient({ apiKey: resolveApiKey(), baseUrl });
 }
 
@@ -70,7 +70,7 @@ export function mergeBodyJson(body: JsonObject, bodyJson?: string): JsonObject {
 }
 
 export async function readStdinLines(): Promise<string[]> {
-  if (process.stdin.isTTY !== false) return [];
+  if (process.stdin.isTTY === true) return [];
 
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) {
@@ -200,14 +200,24 @@ export function isTerminalStatus(status: string | undefined): boolean {
   );
 }
 
+export const DEFAULT_POLL_TIMEOUT_MS = 600_000;
+
 export async function pollUntilTerminal<T>(
   initial: T,
   getStatus: (value: T) => string | undefined,
   getNext: () => Promise<T>,
   intervalMs: number,
+  timeoutMs: number = DEFAULT_POLL_TIMEOUT_MS,
 ): Promise<T> {
+  const deadline = Date.now() + timeoutMs;
   let current = initial;
   while (!isTerminalStatus(getStatus(current))) {
+    if (Date.now() >= deadline) {
+      throw new Error(
+        `Timed out after ${Math.round(timeoutMs / 1000)}s waiting for a terminal status; ` +
+          "the task may still be running on Exa's side.",
+      );
+    }
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
     current = await getNext();
   }

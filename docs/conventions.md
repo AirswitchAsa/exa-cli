@@ -36,10 +36,13 @@ key value is never echoed back to output.
 
 ## Asynchronous commands
 
-`research`, `agent`, and `webset` operations run asynchronously on Exa's
-side. Their `create` subcommands accept `--wait` to poll until completion
-before returning. `agent events` accepts `--follow` to stream events as
-they arrive. The polling pattern is defined once and reused across groups.
+`research`, `agent`, `webset`, and `response` operations run asynchronously
+on Exa's side. Their `create` subcommands accept `--wait` to poll until
+completion before returning, `--poll-interval` to tune the poll cadence, and
+`--timeout` to bound the wait — the command fails with a clear error rather
+than hanging if the task never reaches a terminal status. `agent events`
+accepts `--follow` to stream events as they arrive. The polling pattern is
+defined once and reused across groups.
 
 ## Exit codes
 

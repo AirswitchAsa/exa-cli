@@ -63,7 +63,7 @@ export const similarCommand = new Command("similar")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (url: string, options: SimilarOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = { url };
     addIfDefined(body, "numResults", options.numResults);
     addIfDefined(body, "startCrawlDate", options.startCrawlDate);

@@ -27,6 +27,7 @@ interface AgentCreateOptions extends CommonOptions {
   metadata?: string;
   wait?: boolean;
   pollInterval?: number;
+  timeout?: number;
   bodyJson?: string;
 }
 
@@ -79,10 +80,11 @@ agentCommand
   .option("--metadata <json>", "metadata object to store with the run")
   .option("--wait", "poll until the run reaches a terminal status")
   .option("--poll-interval <ms>", "poll interval for --wait", parseInteger, 2000)
+  .option("--timeout <ms>", "maximum milliseconds to wait for --wait", parseInteger, 600000)
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
   .action(async (query: string, options: AgentCreateOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const body: JsonObject = { query };
     addIfDefined(body, "systemPrompt", options.systemPrompt);
     addIfDefined(body, "effort", options.effort);
@@ -106,6 +108,7 @@ agentCommand
         (value) => getString(value, "status"),
         () => client.get<AgentRun>(`/agent/runs/${encodePath(id)}`, { headers: AGENT_HEADERS }),
         options.pollInterval ?? 2000,
+        options.timeout ?? 600000,
       );
     }
 
@@ -122,7 +125,7 @@ agentCommand
   .argument("<id>", "agent run ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const run = await client.get<AgentRun>(`/agent/runs/${encodePath(id)}`, {
       headers: AGENT_HEADERS,
     });
@@ -140,7 +143,7 @@ agentCommand
   .option("--limit <count>", "number of runs to return", parseInteger)
   .option("--json", "print the raw JSON response")
   .action(async (options: AgentListOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.get<unknown>("/agent/runs", {
       headers: AGENT_HEADERS,
       query: { cursor: options.cursor, limit: options.limit },
@@ -154,7 +157,7 @@ agentCommand
   .argument("<id>", "agent run ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.post<unknown>(`/agent/runs/${encodePath(id)}/cancel`, undefined, {
       headers: AGENT_HEADERS,
     });
@@ -167,7 +170,7 @@ agentCommand
   .argument("<id>", "agent run ID")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: CommonOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const response = await client.delete<unknown>(`/agent/runs/${encodePath(id)}`, {
       headers: AGENT_HEADERS,
     });
@@ -184,7 +187,7 @@ agentCommand
   .option("--follow", "stream events as server-sent events")
   .option("--json", "print the raw JSON response")
   .action(async (id: string, options: AgentEventOptions) => {
-    const client = clientFor(options);
+    const client = clientFor();
     const path = `/agent/runs/${encodePath(id)}/events`;
     const headers = {
       ...AGENT_HEADERS,
