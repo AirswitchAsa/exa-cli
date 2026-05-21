@@ -21,5 +21,5 @@ the Exa API through `#ExaClient`.
 
 ## Notes
 
-- Scaffolded; not yet implemented
+- Implemented in `src/commands/monitor.ts`
 - Maps to the Exa `/monitors` endpoints

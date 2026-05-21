@@ -22,5 +22,5 @@ events emitted during a run. Every subcommand resolves the API key through
 
 ## Notes
 
-- Scaffolded; not yet implemented
+- Implemented in `src/commands/agent.ts`
 - Reuses the polling pattern introduced by `!Research`
