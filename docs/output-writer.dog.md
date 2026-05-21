@@ -1,0 +1,24 @@
+# Component: OutputWriter
+
+## Description
+
+Centralizes how the CLI writes to the terminal. Result content and JSON go
+to stdout so they can be piped; diagnostics and errors go to stderr. This
+separation lets the `@User` compose `exa` commands in shell pipelines.
+
+## State
+
+- stdout: the stream for result content and JSON
+- stderr: the stream for diagnostics and errors
+
+## Events
+
+- json_written
+- text_written
+- error_written
+
+## Notes
+
+- Source: `src/output.ts`
+- `printJson` pretty-prints with two-space indentation
+- Keeping content on stdout and noise on stderr is a deliberate design rule

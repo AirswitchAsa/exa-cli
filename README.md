@@ -54,6 +54,14 @@ Target coverage is the full Exa REST API:
 | `webset`   | `create` · `get` · `list` · `update` · `delete` · `cancel` · `preview` · `search` · `items` · `enrich` · `export` · `import` |
 | `key`      | `create` · `get` · `list` · `update` · `delete` · `usage`       |
 
+## Design reference
+
+[`docs/`](docs/) holds the behavioral and design specification. The
+`.dog.md` files are [DOG](https://github.com/AirswitchAsa/dog) specs — the
+source of truth for actors, behaviors, components, and data. Start from
+[`docs/index.dog.md`](docs/index.dog.md), and see
+[`docs/conventions.md`](docs/conventions.md) for cross-cutting CLI rules.
+
 ## Development
 
 ```bash
