@@ -26,5 +26,5 @@ poll until the task completes before returning.
 
 ## Notes
 
-- Scaffolded; not yet implemented
+- Implemented in `src/commands/research.ts`
 - `--wait` establishes the polling pattern reused by `!Agent`
