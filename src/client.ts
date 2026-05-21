@@ -1,3 +1,7 @@
+import type { IncomingMessage } from "node:http";
+import https from "node:https";
+import { Readable } from "node:stream";
+
 const DEFAULT_BASE_URL = "https://api.exa.ai";
 
 type QueryScalar = boolean | number | string;
@@ -60,15 +64,18 @@ export class ExaClient {
     };
   }
 
-  async #buildError(response: Response): Promise<ExaError> {
-    const raw = await response.text();
+  #errorFrom(status: number, raw: string): ExaError {
     let payload: unknown;
     try {
       payload = raw.length > 0 ? JSON.parse(raw) : undefined;
     } catch {
       payload = raw;
     }
-    return new ExaError(response.status, payload);
+    return new ExaError(status, payload);
+  }
+
+  async #buildError(response: Response): Promise<ExaError> {
+    return this.#errorFrom(response.status, await response.text());
   }
 
   async request<T>(
@@ -77,6 +84,12 @@ export class ExaClient {
     body?: unknown,
     options: RequestOptions = {},
   ): Promise<T> {
+    // The Fetch standard forbids a body on GET requests; Exa's
+    // `GET /responses/{id}` requires one, so that case takes the node:https path.
+    if (method === "GET" && body !== undefined) {
+      return this.#getWithBody<T>(path, body, options);
+    }
+
     const response = await fetch(this.#url(path, options.query), {
       method,
       headers: this.#headers(options.headers, body !== undefined),
@@ -121,6 +134,66 @@ export class ExaClient {
 
   stream(path: string, options: RequestOptions = {}): Promise<ReadableStream<Uint8Array>> {
     return this.requestStream("GET", path, undefined, options);
+  }
+
+  // Issue a GET request that carries a JSON body. Used only for Exa endpoints
+  // that require a request body on GET, which the Fetch API cannot express.
+  #openGetWithBody(path: string, body: unknown, options: RequestOptions): Promise<IncomingMessage> {
+    const url = this.#url(path, options.query);
+    const payload = Buffer.from(JSON.stringify(body));
+    return new Promise<IncomingMessage>((resolve, reject) => {
+      const request = https.request(
+        url,
+        {
+          method: "GET",
+          headers: {
+            ...this.#headers(options.headers, true),
+            "content-length": String(payload.length),
+          },
+        },
+        resolve,
+      );
+      request.on("error", reject);
+      request.write(payload);
+      request.end();
+    });
+  }
+
+  #collect(stream: IncomingMessage): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      stream.on("data", (chunk: Buffer) => chunks.push(chunk));
+      stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+      stream.on("error", reject);
+    });
+  }
+
+  async #getWithBody<T>(path: string, body: unknown, options: RequestOptions): Promise<T> {
+    const response = await this.#openGetWithBody(path, body, options);
+    const raw = await this.#collect(response);
+    const status = response.statusCode ?? 0;
+    if (status < 200 || status >= 300) {
+      throw this.#errorFrom(status, raw);
+    }
+    if (raw.length === 0) return undefined as T;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return raw as T;
+    }
+  }
+
+  async streamWithBody(
+    path: string,
+    body: unknown,
+    options: RequestOptions = {},
+  ): Promise<ReadableStream<Uint8Array>> {
+    const response = await this.#openGetWithBody(path, body, options);
+    const status = response.statusCode ?? 0;
+    if (status < 200 || status >= 300) {
+      throw this.#errorFrom(status, await this.#collect(response));
+    }
+    return Readable.toWeb(response) as ReadableStream<Uint8Array>;
   }
 
   post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {

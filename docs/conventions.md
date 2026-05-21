@@ -54,6 +54,10 @@ response body via the `ExaError` data type.
 
 ## Distribution
 
-The CLI ships as an npm package with a single `exa` binary, targeting
-Node.js 20 or newer. A Bun single-binary build may be added later; it is
-not a launch requirement.
+The CLI ships two ways. The primary channel is an npm package with a single
+`exa` binary, targeting Node.js 20 or newer. The secondary channel is a
+standalone executable built with `bun build --compile`, which embeds the
+runtime so it needs neither Node.js nor an npm install. Tagged `v*` releases
+publish the npm package and attach cross-compiled Bun binaries (macOS and
+Linux, arm64 and x64) as GitHub release assets. See `docs/USER_GUIDE.md` for
+install instructions and `.github/workflows/release.yml` for the pipeline.

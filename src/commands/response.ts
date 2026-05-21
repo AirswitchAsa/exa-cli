@@ -129,16 +129,18 @@ responseCommand
   .action(async (id: string, options: ResponseGetOptions) => {
     const client = clientFor();
     const path = `/responses/${encodePath(id)}`;
+    // Exa's `GET /responses/{id}` requires a JSON request body.
     if (options.stream === true) {
-      const stream = await client.stream(path, {
-        headers: { Accept: "text/event-stream" },
-        query: { stream: true },
-      });
+      const stream = await client.streamWithBody(
+        path,
+        {},
+        { headers: { Accept: "text/event-stream" }, query: { stream: true } },
+      );
       await printStream(stream);
       return;
     }
 
-    const response = await client.get<OpenAIResponse>(path);
+    const response = await client.request<OpenAIResponse>("GET", path, {});
     if (options.json === true) {
       printJson(response);
     } else {

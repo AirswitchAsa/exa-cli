@@ -1,10 +1,71 @@
 import assert from "node:assert/strict";
+import type { IncomingMessage } from "node:http";
+import https from "node:https";
+import { Readable } from "node:stream";
 import type { Command } from "commander";
 
 export interface FetchCall {
   url: URL;
   init: RequestInit;
   body: unknown;
+}
+
+export interface HttpsCall {
+  url: URL;
+  method: string;
+  body: unknown;
+}
+
+/**
+ * Replace `https.request` for the duration of `run`. The CLI uses node:https
+ * (not fetch) for the one Exa endpoint that requires a body on a GET request.
+ */
+export async function withMockHttps(
+  responseBody: unknown,
+  status: number,
+  run: (calls: HttpsCall[]) => Promise<void>,
+): Promise<void> {
+  const original = https.request;
+  const calls: HttpsCall[] = [];
+
+  const mock = (
+    url: string | URL,
+    options: { method?: string },
+    callback: (res: IncomingMessage) => void,
+  ) => {
+    const call: HttpsCall = {
+      url: new URL(String(url)),
+      method: options.method ?? "GET",
+      body: undefined,
+    };
+    calls.push(call);
+    let rawBody = "";
+    const request = {
+      on(): typeof request {
+        return request;
+      },
+      write(chunk: string | Buffer): boolean {
+        rawBody += chunk.toString();
+        return true;
+      },
+      end(): void {
+        call.body = rawBody.length > 0 ? JSON.parse(rawBody) : undefined;
+        const response = Readable.from([Buffer.from(JSON.stringify(responseBody))]) as Readable & {
+          statusCode?: number;
+        };
+        response.statusCode = status;
+        process.nextTick(() => callback(response as unknown as IncomingMessage));
+      },
+    };
+    return request;
+  };
+
+  https.request = mock as unknown as typeof https.request;
+  try {
+    await run(calls);
+  } finally {
+    https.request = original;
+  }
 }
 
 export async function withMockFetch(

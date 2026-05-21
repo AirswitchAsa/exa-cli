@@ -1,0 +1,39 @@
+name: release
+
+# Tag a release with `git tag vX.Y.Z && git push --tags`.
+# Requires an NPM_TOKEN repository secret for the npm publish step.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      # `npm publish` runs prepublishOnly: lint, typecheck, unit tests, build.
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  binaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      # Bun cross-compiles every target from one Linux host.
+      - run: npm run build:bun:all
+      - name: Publish binaries to the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" dist-bin/exa-* --title "$GITHUB_REF_NAME" --generate-notes

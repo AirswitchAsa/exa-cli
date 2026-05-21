@@ -19,7 +19,7 @@ import { similarCommand } from "../src/commands/similar.js";
 import { teamCommand } from "../src/commands/team.js";
 import { websetCommand } from "../src/commands/webset.js";
 import { configPath, readUserConfig } from "../src/config.js";
-import { assertHeader, runCommand, withMockFetch } from "./helpers.js";
+import { assertHeader, runCommand, withMockFetch, withMockHttps } from "./helpers.js";
 
 function allCommands(command: Command): Command[] {
   return [command, ...command.commands.flatMap((child) => allCommands(child))];
@@ -348,7 +348,6 @@ test("chat, context, and response cover OpenAI-compatible endpoints", async () =
       await runCommand(chatCommand, ["hello", "--system", "be brief", "--json"]);
       await runCommand(contextCommand, ["exa api", "--tokens", "1000", "--json"]);
       await runCommand(responseCommand, ["create", "research this", "--json"]);
-      await runCommand(responseCommand, ["get", "resp_1", "--json"]);
 
       assert.equal(calls[0]?.url.pathname, "/chat/completions");
       assert.deepEqual(calls[0]?.body, {
@@ -361,9 +360,20 @@ test("chat, context, and response cover OpenAI-compatible endpoints", async () =
       assert.deepEqual(calls[1]?.body, { query: "exa api", tokensNum: 1000 });
       assert.equal(calls[2]?.url.pathname, "/responses");
       assert.deepEqual(calls[2]?.body, { input: "research this", model: "exa-research" });
-      assert.equal(calls[3]?.url.pathname, "/responses/resp_1");
     },
   );
+});
+
+test("response get issues a GET to /responses/{id} with a JSON body", async () => {
+  // Exa's `GET /responses/{id}` requires a request body, so the CLI uses
+  // node:https instead of fetch for this call.
+  await withMockHttps({ id: "resp_1", output_text: "done" }, 200, async (calls) => {
+    await runCommand(responseCommand, ["get", "resp_1", "--json"]);
+
+    assert.equal(calls[0]?.url.pathname, "/responses/resp_1");
+    assert.equal(calls[0]?.method, "GET");
+    assert.deepEqual(calls[0]?.body, {});
+  });
 });
 
 test("webset commands cover websets, subresources, webhooks, events, monitors, and team", async () => {
