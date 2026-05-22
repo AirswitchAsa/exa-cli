@@ -1,0 +1,742 @@
+{
+  "search": {
+    "flags": [
+      "--additional-queries",
+      "--body-json",
+      "--category",
+      "--compliance",
+      "--end-published-date",
+      "--exclude-domains",
+      "--highlights",
+      "--highlights-query",
+      "--include-domains",
+      "--json",
+      "--moderation",
+      "--num-results",
+      "--output-schema",
+      "--start-published-date",
+      "--stream",
+      "--summary",
+      "--summary-query",
+      "--system-prompt",
+      "--text",
+      "--type",
+      "--user-location"
+    ],
+    "subcommands": {}
+  },
+  "contents": {
+    "flags": [
+      "--body-json",
+      "--code-blocks",
+      "--compliance",
+      "--exclude-sections",
+      "--highlights",
+      "--highlights-query",
+      "--image-links",
+      "--include-html-tags",
+      "--include-sections",
+      "--json",
+      "--links",
+      "--livecrawl-timeout",
+      "--max-age-hours",
+      "--max-characters",
+      "--rich-image-links",
+      "--rich-links",
+      "--subpage-target",
+      "--subpages",
+      "--summary",
+      "--summary-query",
+      "--summary-schema",
+      "--verbosity"
+    ],
+    "subcommands": {}
+  },
+  "answer": {
+    "flags": [
+      "--body-json",
+      "--json",
+      "--output-schema",
+      "--stream",
+      "--text"
+    ],
+    "subcommands": {}
+  },
+  "chat": {
+    "flags": [
+      "--body-json",
+      "--json",
+      "--message",
+      "--messages-json",
+      "--model",
+      "--stream",
+      "--system",
+      "--text"
+    ],
+    "subcommands": {}
+  },
+  "context": {
+    "flags": [
+      "--body-json",
+      "--json",
+      "--tokens"
+    ],
+    "subcommands": {}
+  },
+  "response": {
+    "flags": [],
+    "subcommands": {
+      "create": {
+        "flags": [
+          "--body-json",
+          "--instructions",
+          "--json",
+          "--model",
+          "--output-schema",
+          "--poll-interval",
+          "--schema-description",
+          "--schema-name",
+          "--stream",
+          "--strict",
+          "--timeout",
+          "--wait"
+        ],
+        "subcommands": {}
+      },
+      "get": {
+        "flags": [
+          "--json",
+          "--stream"
+        ],
+        "subcommands": {}
+      }
+    }
+  },
+  "agent": {
+    "flags": [],
+    "subcommands": {
+      "create": {
+        "flags": [
+          "--body-json",
+          "--effort",
+          "--input",
+          "--json",
+          "--metadata",
+          "--output-schema",
+          "--poll-interval",
+          "--previous-run-id",
+          "--system-prompt",
+          "--timeout",
+          "--wait"
+        ],
+        "subcommands": {}
+      },
+      "get": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "list": {
+        "flags": [
+          "--cursor",
+          "--json",
+          "--limit"
+        ],
+        "subcommands": {}
+      },
+      "cancel": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "delete": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "events": {
+        "flags": [
+          "--cursor",
+          "--follow",
+          "--json",
+          "--last-event-id",
+          "--limit"
+        ],
+        "subcommands": {}
+      }
+    }
+  },
+  "monitor": {
+    "flags": [],
+    "subcommands": {
+      "create": {
+        "flags": [
+          "--body-json",
+          "--json",
+          "--metadata",
+          "--name",
+          "--num-results",
+          "--output-schema",
+          "--period",
+          "--query",
+          "--webhook-events",
+          "--webhook-url"
+        ],
+        "subcommands": {}
+      },
+      "get": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "list": {
+        "flags": [
+          "--cursor",
+          "--json",
+          "--limit",
+          "--metadata",
+          "--name",
+          "--status"
+        ],
+        "subcommands": {}
+      },
+      "update": {
+        "flags": [
+          "--body-json",
+          "--clear-metadata",
+          "--clear-trigger",
+          "--json",
+          "--metadata",
+          "--name",
+          "--num-results",
+          "--output-schema",
+          "--period",
+          "--query",
+          "--status",
+          "--webhook-events",
+          "--webhook-url"
+        ],
+        "subcommands": {}
+      },
+      "delete": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "trigger": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "runs": {
+        "flags": [
+          "--cursor",
+          "--json",
+          "--limit"
+        ],
+        "subcommands": {}
+      },
+      "batch": {
+        "flags": [
+          "--action",
+          "--body-json",
+          "--execute",
+          "--filter-metadata",
+          "--filter-name",
+          "--filter-status",
+          "--json",
+          "--limit"
+        ],
+        "subcommands": {}
+      }
+    }
+  },
+  "webset": {
+    "flags": [],
+    "subcommands": {
+      "create": {
+        "flags": [
+          "--body-json",
+          "--count",
+          "--enrichment-json",
+          "--exclude-json",
+          "--external-id",
+          "--import-json",
+          "--json",
+          "--metadata",
+          "--poll-interval",
+          "--query",
+          "--search-json",
+          "--timeout",
+          "--title",
+          "--wait"
+        ],
+        "subcommands": {}
+      },
+      "get": {
+        "flags": [
+          "--expand",
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "list": {
+        "flags": [
+          "--cursor",
+          "--json",
+          "--limit",
+          "--search"
+        ],
+        "subcommands": {}
+      },
+      "update": {
+        "flags": [
+          "--body-json",
+          "--clear-metadata",
+          "--json",
+          "--metadata",
+          "--title"
+        ],
+        "subcommands": {}
+      },
+      "delete": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "cancel": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "preview": {
+        "flags": [
+          "--body-json",
+          "--count",
+          "--json",
+          "--query",
+          "--search"
+        ],
+        "subcommands": {}
+      },
+      "search": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--behavior",
+              "--body-json",
+              "--count",
+              "--json",
+              "--query"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "cancel": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "items": {
+        "flags": [],
+        "subcommands": {
+          "list": {
+            "flags": [
+              "--cursor",
+              "--json",
+              "--limit",
+              "--source-id"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "delete": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "enrich": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--body-json",
+              "--description",
+              "--format",
+              "--json",
+              "--metadata",
+              "--options"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "update": {
+            "flags": [
+              "--body-json",
+              "--clear-metadata",
+              "--description",
+              "--format",
+              "--json",
+              "--metadata",
+              "--options"
+            ],
+            "subcommands": {}
+          },
+          "delete": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "cancel": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "import": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--body-json",
+              "--count",
+              "--csv-identifier",
+              "--entity",
+              "--format",
+              "--json",
+              "--metadata",
+              "--size",
+              "--title"
+            ],
+            "subcommands": {}
+          },
+          "list": {
+            "flags": [
+              "--cursor",
+              "--json",
+              "--limit"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "update": {
+            "flags": [
+              "--body-json",
+              "--json",
+              "--metadata",
+              "--title"
+            ],
+            "subcommands": {}
+          },
+          "delete": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "webhook": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--body-json",
+              "--events",
+              "--json",
+              "--metadata",
+              "--url"
+            ],
+            "subcommands": {}
+          },
+          "list": {
+            "flags": [
+              "--cursor",
+              "--json",
+              "--limit"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "update": {
+            "flags": [
+              "--body-json",
+              "--clear-metadata",
+              "--events",
+              "--json",
+              "--metadata",
+              "--url"
+            ],
+            "subcommands": {}
+          },
+          "delete": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "attempts": {
+            "flags": [
+              "--cursor",
+              "--event-type",
+              "--json",
+              "--limit",
+              "--successful"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "events": {
+        "flags": [],
+        "subcommands": {
+          "list": {
+            "flags": [
+              "--created-after",
+              "--created-before",
+              "--cursor",
+              "--json",
+              "--limit",
+              "--types"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "monitor": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--behavior",
+              "--body-json",
+              "--cron",
+              "--json",
+              "--metadata",
+              "--timezone",
+              "--webset-id"
+            ],
+            "subcommands": {}
+          },
+          "list": {
+            "flags": [
+              "--cursor",
+              "--json",
+              "--limit",
+              "--webset-id"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "update": {
+            "flags": [
+              "--behavior",
+              "--body-json",
+              "--cron",
+              "--json",
+              "--metadata",
+              "--timezone",
+              "--webset-id"
+            ],
+            "subcommands": {}
+          },
+          "delete": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "runs": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      },
+      "team": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "export": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--body-json",
+              "--format",
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          }
+        }
+      }
+    }
+  },
+  "team": {
+    "flags": [],
+    "subcommands": {
+      "keys": {
+        "flags": [],
+        "subcommands": {
+          "create": {
+            "flags": [
+              "--body-json",
+              "--budget-cents",
+              "--json",
+              "--name",
+              "--rate-limit"
+            ],
+            "subcommands": {}
+          },
+          "get": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "list": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "update": {
+            "flags": [
+              "--body-json",
+              "--budget-cents",
+              "--clear-budget",
+              "--json",
+              "--name",
+              "--rate-limit"
+            ],
+            "subcommands": {}
+          },
+          "delete": {
+            "flags": [
+              "--json"
+            ],
+            "subcommands": {}
+          },
+          "usage": {
+            "flags": [
+              "--end-date",
+              "--group-by",
+              "--json",
+              "--start-date"
+            ],
+            "subcommands": {}
+          }
+        }
+      }
+    }
+  },
+  "api-key": {
+    "flags": [],
+    "subcommands": {
+      "set": {
+        "flags": [],
+        "subcommands": {}
+      },
+      "status": {
+        "flags": [],
+        "subcommands": {}
+      },
+      "unset": {
+        "flags": [],
+        "subcommands": {}
+      }
+    }
+  },
+  "config": {
+    "flags": [],
+    "subcommands": {
+      "path": {
+        "flags": [],
+        "subcommands": {}
+      },
+      "list": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "get": {
+        "flags": [
+          "--json"
+        ],
+        "subcommands": {}
+      },
+      "set": {
+        "flags": [],
+        "subcommands": {}
+      },
+      "unset": {
+        "flags": [],
+        "subcommands": {}
+      }
+    }
+  }
+}
