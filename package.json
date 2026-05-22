@@ -1,10 +1,10 @@
 {
   "name": "@spicadust/exa-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Unofficial command-line interface for the Exa API. Not affiliated with Exa.",
   "type": "module",
   "bin": {
-    "exa": "dist/cli.js"
+    "exa-cli": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -15,9 +15,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc && chmod +x dist/cli.js",
-    "build:bun": "bun build src/cli.ts --compile --outfile dist-bin/exa",
-    "build:bun:all": "for t in bun-darwin-arm64 bun-linux-x64 bun-linux-arm64 bun-windows-x64; do bun build src/cli.ts --compile --target=$t --outfile dist-bin/exa-${t#bun-}; done",
+    "build": "rm -rf dist && tsc && chmod +x dist/cli.js",
+    "build:bun": "bun build src/cli.ts --compile --outfile dist-bin/exa-cli",
+    "build:bun:all": "for t in bun-darwin-arm64 bun-linux-x64 bun-linux-arm64 bun-windows-x64; do bun build src/cli.ts --compile --target=$t --outfile dist-bin/exa-cli-${t#bun-}; done",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts",
@@ -54,6 +54,7 @@
     "@biomejs/biome": "^2.2.0",
     "@types/node": "^24.0.0",
     "tsx": "^4.20.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "yaml": "^2.9.0"
   }
 }

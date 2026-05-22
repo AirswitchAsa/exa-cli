@@ -92,16 +92,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: exa-darwin-arm64
+          - target: exa-cli-darwin-arm64
             runner: macos-14
             ext: ""
-          - target: exa-linux-x64
+          - target: exa-cli-linux-x64
             runner: ubuntu-22.04
             ext: ""
-          - target: exa-linux-arm64
+          - target: exa-cli-linux-arm64
             runner: ubuntu-22.04-arm
             ext: ""
-          - target: exa-windows-x64
+          - target: exa-cli-windows-x64
             runner: windows-latest
             ext: ".exe"
 
@@ -114,17 +114,17 @@ jobs:
 
       - name: Build standalone binary
         shell: bash
-        run: bun build src/cli.ts --compile --outfile "dist-bin/exa${{ matrix.ext }}"
+        run: bun build src/cli.ts --compile --outfile "dist-bin/exa-cli${{ matrix.ext }}"
 
       - name: Smoke test
         shell: bash
-        run: "dist-bin/exa${{ matrix.ext }} --help"
+        run: "dist-bin/exa-cli${{ matrix.ext }} --help"
 
       - name: Stage asset
         shell: bash
         run: |
           mkdir -p artifacts
-          cp "dist-bin/exa${{ matrix.ext }}" "artifacts/${{ matrix.target }}${{ matrix.ext }}"
+          cp "dist-bin/exa-cli${{ matrix.ext }}" "artifacts/${{ matrix.target }}${{ matrix.ext }}"
 
       - uses: actions/upload-artifact@v5
         with:

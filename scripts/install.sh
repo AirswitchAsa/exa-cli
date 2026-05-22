@@ -22,7 +22,7 @@ uname_m="$(uname -m)"
 case "$uname_s" in
   Darwin) os="darwin" ;;
   Linux)  os="linux" ;;
-  *)      err "unsupported OS: $uname_s (Windows: download exa-windows-x64.exe from https://github.com/$REPO/releases/latest)" ;;
+  *)      err "unsupported OS: $uname_s (Windows: download exa-cli-windows-x64.exe from https://github.com/$REPO/releases/latest)" ;;
 esac
 
 case "$uname_m" in
@@ -35,7 +35,7 @@ if [ "$os" = "darwin" ] && [ "$arch" = "x64" ]; then
   err "Intel macOS binaries are not published. Install with 'npm install -g @spicadust/exa-cli', or build from source."
 fi
 
-asset="exa-${os}-${arch}"
+asset="exa-cli-${os}-${arch}"
 
 if [ "$VERSION" = "latest" ]; then
   url="https://github.com/${REPO}/releases/latest/download/${asset}"
@@ -54,7 +54,7 @@ if ! curl -fsSL --retry 3 -o "$tmp" "$url"; then
   err "download failed (asset may not exist for this platform: $asset)"
 fi
 
-target="$INSTALL_DIR/exa"
+target="$INSTALL_DIR/exa-cli"
 mv "$tmp" "$target"
 chmod +x "$target"
 trap - EXIT
@@ -67,4 +67,4 @@ case ":$PATH:" in
 esac
 
 "$target" --help >/dev/null 2>&1 || err "installed binary failed self-check"
-info "ok: run 'exa --help' to verify"
+info "ok: run 'exa-cli --help' to verify"
