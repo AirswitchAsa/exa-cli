@@ -109,7 +109,6 @@ export function getArray(value: unknown, key = "data"): unknown[] | undefined {
 export function formatIdStatus(value: unknown, fallbackId = "id"): string {
   const id =
     getString(value, "id") ??
-    getString(value, "researchId") ??
     getString(value, "keyId") ??
     getString(value, fallbackId) ??
     "(no id)";
@@ -150,7 +149,6 @@ export function printObject(response: unknown): void {
   const fields = response as JsonObject;
   const keys = [
     "id",
-    "researchId",
     "object",
     "status",
     "name",

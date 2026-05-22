@@ -1,5 +1,5 @@
 // Live integration tests for the synchronous search-family endpoints:
-// search, contents, answer, similar, chat, context.
+// search, contents, answer, chat, context.
 
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -58,16 +58,6 @@ test("answer --stream emits a server-sent event stream", {
   const run = await exa(["answer", "Name one search engine.", "--stream"]);
   assert.equal(run.code, 0, run.stderr);
   assert.ok(run.stdout.length > 0, "expected streamed output on stdout");
-});
-
-test("similar finds pages related to a URL", { skip, timeout: TEST_TIMEOUT }, async () => {
-  const response = await exaJson<SearchResponse>([
-    "similar",
-    "https://arxiv.org/abs/2307.06435",
-    "-n",
-    "3",
-  ]);
-  assert.ok(Array.isArray(response.results), "results should be an array");
 });
 
 test("chat returns an OpenAI-compatible completion", { skip, timeout: TEST_TIMEOUT }, async () => {

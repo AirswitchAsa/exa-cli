@@ -12,10 +12,8 @@ import { configCommand } from "../src/commands/config.js";
 import { contentsCommand } from "../src/commands/contents.js";
 import { contextCommand } from "../src/commands/context.js";
 import { monitorCommand } from "../src/commands/monitor.js";
-import { researchCommand } from "../src/commands/research.js";
 import { responseCommand } from "../src/commands/response.js";
 import { searchCommand } from "../src/commands/search.js";
-import { similarCommand } from "../src/commands/similar.js";
 import { teamCommand } from "../src/commands/team.js";
 import { websetCommand } from "../src/commands/webset.js";
 import { configPath, readUserConfig } from "../src/config.js";
@@ -47,11 +45,9 @@ test("commands do not expose API keys as flags", () => {
     searchCommand,
     contentsCommand,
     answerCommand,
-    similarCommand,
     chatCommand,
     contextCommand,
     responseCommand,
-    researchCommand,
     agentCommand,
     monitorCommand,
     websetCommand,
@@ -153,22 +149,15 @@ test("contents maps URL arguments and extraction options", async () => {
   );
 });
 
-test("answer and similar cover their synchronous endpoints", async () => {
+test("answer covers its synchronous endpoint", async () => {
   await withMockFetch(
-    () => ({ answer: "yes", citations: [], results: [] }),
+    () => ({ answer: "yes", citations: [] }),
     async (calls) => {
       await runCommand(answerCommand, [
         "What is Exa?",
         "--text",
         "--output-schema",
         '{"type":"object"}',
-        "--json",
-      ]);
-      await runCommand(similarCommand, [
-        "https://exa.ai",
-        "--num-results",
-        "2",
-        "--moderation",
         "--json",
       ]);
 
@@ -178,35 +167,6 @@ test("answer and similar cover their synchronous endpoints", async () => {
         text: true,
         outputSchema: { type: "object" },
       });
-      assert.equal(calls[1]?.url.pathname, "/findSimilar");
-      assert.deepEqual(calls[1]?.body, {
-        url: "https://exa.ai",
-        numResults: 2,
-        moderation: true,
-      });
-    },
-  );
-});
-
-test("research create --wait polls until terminal", async () => {
-  await withMockFetch(
-    (_call, index) =>
-      index === 0
-        ? { researchId: "r_1", status: "running" }
-        : { researchId: "r_1", status: "completed", output: { content: "done" } },
-    async (calls) => {
-      await runCommand(researchCommand, [
-        "create",
-        "write report",
-        "--wait",
-        "--poll-interval",
-        "1",
-        "--json",
-      ]);
-
-      assert.equal(calls[0]?.url.pathname, "/research/v1");
-      assert.equal(calls[1]?.url.pathname, "/research/v1/r_1");
-      assert.equal(calls[1]?.url.searchParams.get("events"), "true");
     },
   );
 });

@@ -96,5 +96,5 @@ export async function exaJson<T = unknown>(args: string[]): Promise<T> {
   }
 }
 
-/** A generous per-test timeout — live calls to research/answer endpoints are slow. */
+/** A generous per-test timeout — live calls to answer/agent endpoints are slow. */
 export const TEST_TIMEOUT = 180_000;

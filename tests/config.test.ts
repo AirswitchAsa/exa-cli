@@ -115,7 +115,7 @@ test("resolveApiKey gives an actionable missing-key error", () => {
   withIsolatedConfig(() => {
     try {
       process.chdir(dir);
-      assert.throws(() => resolveApiKey(), /exa api-key set.*EXA_API_KEY.*\.env/);
+      assert.throws(() => resolveApiKey(), /exa-cli api-key set.*EXA_API_KEY.*\.env/);
     } finally {
       process.chdir(previousCwd);
       rmSync(dir, { recursive: true, force: true });

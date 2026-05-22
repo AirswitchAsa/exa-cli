@@ -96,7 +96,7 @@ configCommand
   .argument("<name>", "preference name")
   .argument("<value>", "JSON value, or a plain string if not valid JSON")
   .action((name: string, value: string) => {
-    if (name === "apiKey") throw new Error("Use `exa api-key set` to store API keys.");
+    if (name === "apiKey") throw new Error("Use `exa-cli api-key set` to store API keys.");
     writePreference(name, parsePreferenceValue(value));
     printLine(`Set ${name} in ${configPath()}.`);
   });

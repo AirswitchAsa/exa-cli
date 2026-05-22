@@ -19,8 +19,6 @@ interface SearchOptions extends CommonOptions {
   additionalQueries?: string;
   includeDomains?: string;
   excludeDomains?: string;
-  startCrawlDate?: string;
-  endCrawlDate?: string;
   startPublishedDate?: string;
   endPublishedDate?: string;
   userLocation?: string;
@@ -49,7 +47,6 @@ interface SearchResult {
 
 interface SearchResponse {
   results: SearchResult[];
-  searchType?: string;
   output?: {
     content?: string | JsonObject;
   };
@@ -63,10 +60,7 @@ export const searchCommand = new Command("search")
     "number of results to return (default 10, max 100)",
     parseInteger,
   )
-  .option(
-    "-t, --type <type>",
-    "search type: auto, neural, fast, instant, deep-lite, deep, deep-reasoning",
-  )
+  .option("-t, --type <type>", "search type: auto, fast, instant, deep-lite, deep, deep-reasoning")
   .option(
     "-c, --category <category>",
     "category focus: company, research paper, news, personal site, financial report, people",
@@ -74,8 +68,6 @@ export const searchCommand = new Command("search")
   .option("--additional-queries <queries>", "comma-separated additional deep-search queries")
   .option("--include-domains <domains>", "comma-separated domains to include")
   .option("--exclude-domains <domains>", "comma-separated domains to exclude")
-  .option("--start-crawl-date <date>", "only include links crawled after this ISO date")
-  .option("--end-crawl-date <date>", "only include links crawled before this ISO date")
   .option("--start-published-date <date>", "only include links published after this ISO date")
   .option("--end-published-date <date>", "only include links published before this ISO date")
   .option("--user-location <country>", "two-letter ISO country code for localization")
@@ -98,8 +90,6 @@ export const searchCommand = new Command("search")
     addIfDefined(body, "numResults", options.numResults);
     addIfDefined(body, "type", options.type);
     addIfDefined(body, "category", options.category);
-    addIfDefined(body, "startCrawlDate", options.startCrawlDate);
-    addIfDefined(body, "endCrawlDate", options.endCrawlDate);
     addIfDefined(body, "startPublishedDate", options.startPublishedDate);
     addIfDefined(body, "endPublishedDate", options.endPublishedDate);
     addIfDefined(body, "userLocation", options.userLocation);

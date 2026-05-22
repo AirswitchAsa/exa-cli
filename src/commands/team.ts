@@ -46,7 +46,7 @@ function bodyFrom(options: KeyCreateOptions | KeyUpdateOptions): JsonObject {
 }
 
 export const teamCommand = new Command("team").description(
-  "Manage your Exa team. Requires a team service key (see `exa team keys`).",
+  "Manage your Exa team. Requires a team service key (see `exa-cli team keys`).",
 );
 
 const keysCommand = teamCommand

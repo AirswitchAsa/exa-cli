@@ -24,13 +24,15 @@ interface ContentsOptions extends CommonOptions {
   summary?: boolean;
   summaryQuery?: string;
   summarySchema?: string;
-  livecrawl?: string;
   livecrawlTimeout?: number;
   maxAgeHours?: number;
   subpages?: number;
   subpageTarget?: string;
   links?: number;
   imageLinks?: number;
+  richImageLinks?: number;
+  richLinks?: number;
+  codeBlocks?: number;
   compliance?: string;
   bodyJson?: string;
 }
@@ -81,7 +83,6 @@ function contentOptions(options: ContentsOptions): JsonObject {
     body.summary = summary;
   }
 
-  addIfDefined(body, "livecrawl", options.livecrawl);
   addIfDefined(body, "livecrawlTimeout", options.livecrawlTimeout);
   addIfDefined(body, "maxAgeHours", options.maxAgeHours);
   addIfDefined(body, "subpages", options.subpages);
@@ -90,12 +91,13 @@ function contentOptions(options: ContentsOptions): JsonObject {
       ? splitList(options.subpageTarget)
       : options.subpageTarget;
   }
-  if (options.links !== undefined || options.imageLinks !== undefined) {
-    body.extras = {
-      ...(options.links !== undefined ? { links: options.links } : {}),
-      ...(options.imageLinks !== undefined ? { imageLinks: options.imageLinks } : {}),
-    };
-  }
+  const extras: JsonObject = {};
+  addIfDefined(extras, "links", options.links);
+  addIfDefined(extras, "imageLinks", options.imageLinks);
+  addIfDefined(extras, "richImageLinks", options.richImageLinks);
+  addIfDefined(extras, "richLinks", options.richLinks);
+  addIfDefined(extras, "codeBlocks", options.codeBlocks);
+  if (Object.keys(extras).length > 0) body.extras = extras;
   addIfDefined(body, "compliance", options.compliance);
 
   return body;
@@ -135,13 +137,23 @@ export const contentsCommand = new Command("contents")
   .option("--summary", "include a summary")
   .option("--summary-query <query>", "query to guide summary generation")
   .option("--summary-schema <json>", "JSON schema for structured summary output")
-  .option("--livecrawl <mode>", "livecrawl mode: never, fallback, preferred, always")
-  .option("--livecrawl-timeout <ms>", "livecrawl timeout in milliseconds", parseInteger)
-  .option("--max-age-hours <hours>", "maximum cache age before livecrawling", parseInteger)
+  .option("--livecrawl-timeout <ms>", "crawl timeout in milliseconds", parseInteger)
+  .option(
+    "--max-age-hours <hours>",
+    "maximum cache age in hours: -1 always cache, 0 fetch fresh",
+    parseInteger,
+  )
   .option("--subpages <count>", "number of subpages to crawl", parseInteger)
   .option("--subpage-target <target>", "subpage target string or comma-separated targets")
   .option("--links <count>", "number of links to return per page", parseInteger)
   .option("--image-links <count>", "number of image links to return per page", parseInteger)
+  .option(
+    "--rich-image-links <count>",
+    "number of rich image links to return per page",
+    parseInteger,
+  )
+  .option("--rich-links <count>", "number of rich links to return per page", parseInteger)
+  .option("--code-blocks <count>", "number of code blocks to return per page", parseInteger)
   .option("--compliance <mode>", "enterprise compliance mode, such as hipaa")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")

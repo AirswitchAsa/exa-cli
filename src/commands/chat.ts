@@ -7,7 +7,6 @@ import {
   type JsonObject,
   mergeBodyJson,
   parseJson,
-  parseJsonObject,
   printStream,
 } from "./_shared.js";
 
@@ -16,11 +15,7 @@ interface ChatOptions extends CommonOptions {
   system?: string;
   message?: string[];
   messagesJson?: string;
-  query?: string;
   text?: boolean;
-  outputSchema?: string;
-  userLocation?: string;
-  behavior?: string;
   stream?: boolean;
   bodyJson?: string;
 }
@@ -73,15 +68,11 @@ function printChat(response: ChatCompletionResponse): void {
 export const chatCommand = new Command("chat")
   .description("Run an OpenAI-compatible chat completion backed by Exa search models.")
   .argument("<prompt>", "user prompt")
-  .option("--model <model>", "model: exa, exa-pro, exa-research, exa-research-pro")
+  .option("--model <model>", "model: exa, exa-research, exa-research-pro")
   .option("--system <prompt>", "system message")
   .option("--message <message>", "additional user message; repeatable", collect)
   .option("--messages-json <json>", "full OpenAI-compatible messages array")
-  .option("--query <query>", "explicit search query")
   .option("--text", "include full text in answer-model search results")
-  .option("--output-schema <json>", "JSON schema for structured output")
-  .option("--user-location <country>", "optional user location context")
-  .option("--behavior <json>", "behavior controls JSON object")
   .option("--stream", "stream server-sent chat completion chunks")
   .option("--body-json <json>", "merge raw JSON request fields")
   .option("--json", "print the raw JSON response")
@@ -89,16 +80,8 @@ export const chatCommand = new Command("chat")
     const client = clientFor();
     const body: JsonObject = { messages: messagesFrom(prompt, options) };
     addIfDefined(body, "model", options.model);
-    addIfDefined(body, "query", options.query);
     addIfDefined(body, "text", options.text);
-    addIfDefined(body, "userLocation", options.userLocation);
     addIfDefined(body, "stream", options.stream);
-    if (options.outputSchema !== undefined) {
-      body.outputSchema = parseJsonObject(options.outputSchema, "--output-schema");
-    }
-    if (options.behavior !== undefined) {
-      body.behaviour = parseJsonObject(options.behavior, "--behavior");
-    }
 
     const request = mergeBodyJson(body, options.bodyJson);
     if (options.stream === true) {

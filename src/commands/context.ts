@@ -18,11 +18,11 @@ interface ContextResponse {
 }
 
 export const contextCommand = new Command("context")
-  .description("Build an LLM-ready context string from a web search.")
-  .argument("<query>", "query to search the web for")
+  .description("Retrieve token-efficient code context (Exa Code) for a query.")
+  .argument("<query>", "query describing the code, library, or API you need")
   .option(
     "--tokens <count>",
-    "target token count, 50-100000; omit to let Exa size the context dynamically",
+    "target token count, 50-100000; omit to let Exa size the response dynamically",
     parseInteger,
   )
   .option("--body-json <json>", "merge raw JSON request fields")

@@ -139,7 +139,7 @@ export function resolveApiKey(): string {
   const resolution = resolveApiKeySource();
   if (resolution.key === undefined) {
     throw new Error(
-      "No Exa API key found. Run `exa api-key set`, set EXA_API_KEY, or add EXA_API_KEY to .env.",
+      "No Exa API key found. Run `exa-cli api-key set`, set EXA_API_KEY, or add EXA_API_KEY to .env.",
     );
   }
   return resolution.key;

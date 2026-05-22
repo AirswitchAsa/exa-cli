@@ -10,10 +10,8 @@ import { configCommand } from "./commands/config.js";
 import { contentsCommand } from "./commands/contents.js";
 import { contextCommand } from "./commands/context.js";
 import { monitorCommand } from "./commands/monitor.js";
-import { researchCommand } from "./commands/research.js";
 import { responseCommand } from "./commands/response.js";
 import { searchCommand } from "./commands/search.js";
-import { similarCommand } from "./commands/similar.js";
 import { teamCommand } from "./commands/team.js";
 import { websetCommand } from "./commands/webset.js";
 import { printError } from "./output.js";
@@ -21,7 +19,7 @@ import { printError } from "./output.js";
 const program = new Command();
 
 program
-  .name("exa")
+  .name("exa-cli")
   .description(
     "Unofficial command-line interface for the Exa API. " +
       "An independent project, not affiliated with or endorsed by Exa.",
@@ -33,11 +31,9 @@ for (const command of [
   searchCommand,
   contentsCommand,
   answerCommand,
-  similarCommand,
   chatCommand,
   contextCommand,
   responseCommand,
-  researchCommand,
   agentCommand,
   monitorCommand,
   websetCommand,
