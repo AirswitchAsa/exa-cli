@@ -3,11 +3,11 @@
 ## Condition
 
 - `@User` has one or more URLs and wants their clean, parsed contents
-- `@User` runs `exa contents <url...>`
+- `@User` runs `exa-cli contents <url...>`
 
 ## Description
 
-The `@User` runs `exa contents` with one or more URLs. The `#CLI` resolves
+The `@User` runs `exa-cli contents` with one or more URLs. The `#CLI` resolves
 the API key through `#ConfigResolver` and uses `#ExaClient` to POST to the
 Exa `/contents` endpoint, which returns parsed page text, summaries, and
 metadata. URLs may also be supplied on stdin so the command composes with
@@ -22,5 +22,5 @@ shell pipelines.
 ## Notes
 
 - Implemented in `src/commands/contents.ts`
-- Supports URL arguments, stdin URLs, `--max-characters`, `--livecrawl`,
+- Supports URL arguments, stdin URLs, `--max-characters`, `--max-age-hours`,
   `--json`, and `--body-json` for advanced request fields

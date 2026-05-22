@@ -3,7 +3,7 @@
 ## Condition
 
 - `@User` wants recurring Exa searches that run on a schedule
-- `@User` runs `exa monitor create`, `get`, `list`, `update`, `delete`, `trigger`, `runs`, or `batch`
+- `@User` runs `exa-cli monitor create`, `get`, `list`, `update`, `delete`, `trigger`, `runs`, or `batch`
 
 ## Description
 

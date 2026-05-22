@@ -10,8 +10,8 @@ engine built for AI.
 
 Exa has a broad, well-designed REST API but no official CLI. `exa-cli` covers
 that surface from the terminal, so every Exa capability — search, content
-extraction, answers, research, agents, monitors, and Websets — is available to
-shell scripts and agent harnesses without the MCP server.
+extraction, answers, agents, monitors, and Websets — is available to shell
+scripts and agent harnesses without the MCP server.
 
 The project is written TypeScript, one command module per API area, mapped
 directly onto Exa's published [API reference](https://exa.ai/docs/reference).
@@ -47,22 +47,30 @@ channels.
 npx skills install https://github.com/AirswitchAsa/exa-cli/tree/master/skills/exa
 ```
 
-The skill bootstraps the `exa` executable itself — via `npx` or a prebuilt
-binary — so installing the CLI separately is optional.
+The skill resolves the `exa-cli` command itself: it uses an installed
+`exa-cli` if present, otherwise runs it via `npx` — so installing the CLI
+globally is optional, though it does make repeated calls faster.
+
+When the skill is active, it makes Exa the agent's default for open-web search
+and research — progressively standing in for a generic built-in web search.
+Page fetching is left to the agent's judgment between its own tooling and
+`exa-cli contents`. This is a recommendation the skill makes, not an override:
+it cannot disable the agent's own tools. To opt out, set tool preferences in
+your agent's settings — that is outside the skill's scope.
 
 ## Quick start
 
 ```bash
-export EXA_API_KEY=...   # get a key at https://exa.ai, or run `exa api-key set`
+export EXA_API_KEY=...   # get a key at https://exa.ai, or run `exa-cli api-key set`
 
-exa search "embeddings-based retrieval" --num-results 5
-exa answer "What changed in Exa's API recently?" --text
-exa contents https://exa.ai --summary
-exa research create "Compare Exa Websets and Monitors" --wait
+exa-cli search "embeddings-based retrieval" --num-results 5
+exa-cli answer "What changed in Exa's API recently?" --text
+exa-cli contents https://exa.ai --summary
+exa-cli search "Compare Exa Websets and Monitors" --type deep-reasoning
 ```
 
 Add `--json` to any command for the raw API response; omit it for
-human-readable text. `exa --help` lists every command.
+human-readable text. `exa-cli --help` lists every command.
 
 ## Documentation
 
@@ -77,9 +85,9 @@ human-readable text. `exa --help` lists every command.
 
 ## Commands
 
-`search` · `contents` · `answer` · `similar` · `chat` · `context` ·
-`response` · `research` · `agent` · `monitor` · `webset` · `team` ·
-`api-key` · `config` — covering the full Exa REST API. See the
+`search` · `contents` · `answer` · `chat` · `context` · `response` ·
+`agent` · `monitor` · `webset` · `team` · `api-key` · `config` — covering the
+current Exa REST API. See the
 [user guide](docs/USER_GUIDE.md#command-reference) for details.
 
 ## Development

@@ -3,11 +3,11 @@
 ## Condition
 
 - `@User` wants to manage their Exa team's API keys
-- `@User` runs `exa team keys create`, `get`, `list`, `update`, `delete`, or `usage`
+- `@User` runs `exa-cli team keys create`, `get`, `list`, `update`, `delete`, or `usage`
 
 ## Description
 
-The `@User` manages team API keys under the `exa team keys` command group.
+The `@User` manages team API keys under the `exa-cli team keys` command group.
 Subcommands create a key, retrieve a key, list keys, update a key's name,
 rate limit, and budget in cents, delete a key, and report usage analytics
 with date range and grouping query parameters. Every subcommand resolves the

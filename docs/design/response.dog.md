@@ -3,13 +3,13 @@
 ## Condition
 
 - `@User` wants an OpenAI-compatible Exa research response
-- `@User` runs `exa response create` or `exa response get`
+- `@User` runs `exa-cli response create` or `exa-cli response get`
 
 ## Description
 
-The `@User` manages Exa Responses API calls. `exa response create` POSTs to
+The `@User` manages Exa Responses API calls. `exa-cli response create` POSTs to
 `/responses` with an input prompt, model, optional instructions, optional
-structured output format, and optional streaming. `exa response get <id>`
+structured output format, and optional streaming. `exa-cli response get <id>`
 retrieves `/responses/{id}` and can request a server-sent event stream.
 Every subcommand resolves the API key through `#ConfigResolver` and calls
 the Exa API through `#ExaClient`.

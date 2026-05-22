@@ -3,7 +3,7 @@
 ## Condition
 
 - `@User` wants a curated, enriched collection of web entities
-- `@User` runs `exa webset` with one of its subcommands
+- `@User` runs `exa-cli webset` with one of its subcommands
 
 ## Description
 

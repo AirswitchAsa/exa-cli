@@ -18,10 +18,8 @@ Project index for Exa CLI.
 - [Contents](contents.dog.md)
 - [Context](context.dog.md)
 - [Monitor](monitor.dog.md)
-- [Research](research.dog.md)
 - [Response](response.dog.md)
 - [Search](search.dog.md)
-- [Similar](similar.dog.md)
 - [Team](team.dog.md)
 - [Webset](webset.dog.md)
 

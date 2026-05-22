@@ -3,7 +3,7 @@
 ## Condition
 
 - `@User` wants to inspect or edit non-secret CLI preferences
-- `@User` runs `exa config path`, `list`, `get`, `set`, or `unset`
+- `@User` runs `exa-cli config path`, `list`, `get`, `set`, or `unset`
 
 ## Description
 

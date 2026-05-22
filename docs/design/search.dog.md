@@ -3,11 +3,11 @@
 ## Condition
 
 - `@User` wants to find web pages for a query and optionally extract their contents
-- `@User` runs `exa search <query>` with an Exa API key available
+- `@User` runs `exa-cli search <query>` with an Exa API key available
 
 ## Description
 
-The `@User` runs `exa search` with a query string and optional flags. The
+The `@User` runs `exa-cli search` with a query string and optional flags. The
 `#CLI` parses the arguments, resolves the API key through `#ConfigResolver`,
 and uses `#ExaClient` to POST to the Exa `/search` endpoint. Supported flags
 cover the main request surface: `--num-results`, `--type`, `--category`,

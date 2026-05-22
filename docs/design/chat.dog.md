@@ -3,11 +3,11 @@
 ## Condition
 
 - `@User` wants an OpenAI-compatible chat completion backed by Exa
-- `@User` runs `exa chat <prompt>`
+- `@User` runs `exa-cli chat <prompt>`
 
 ## Description
 
-The `@User` runs `exa chat` with a prompt and optional chat controls. The
+The `@User` runs `exa-cli chat` with a prompt and optional chat controls. The
 `#CLI` resolves the API key through `#ConfigResolver` and uses `#ExaClient`
 to POST to the Exa `/chat/completions` endpoint. The command supports simple
 prompt input, optional system and additional user messages, raw

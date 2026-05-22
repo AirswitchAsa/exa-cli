@@ -3,7 +3,7 @@
 ## Condition
 
 - `@User` wants a multi-step research agent run with replayable events
-- `@User` runs `exa agent create`, `get`, `list`, `cancel`, `delete`, or `events`
+- `@User` runs `exa-cli agent create`, `get`, `list`, `cancel`, `delete`, or `events`
 
 ## Description
 
@@ -23,4 +23,4 @@ key through `#ConfigResolver` and calls the Exa API through `#ExaClient`.
 ## Notes
 
 - Implemented in `src/commands/agent.ts`
-- Reuses the polling pattern introduced by `!Research`
+- Reuses the shared `--wait` polling pattern (see `!Response`)

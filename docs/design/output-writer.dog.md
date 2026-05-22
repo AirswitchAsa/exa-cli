@@ -4,7 +4,7 @@
 
 Centralizes how the CLI writes to the terminal. Result content and JSON go
 to stdout so they can be piped; diagnostics and errors go to stderr. This
-separation lets the `@User` compose `exa` commands in shell pipelines.
+separation lets the `@User` compose `exa-cli` commands in shell pipelines.
 
 ## State
 

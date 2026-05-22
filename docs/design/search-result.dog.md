@@ -2,7 +2,7 @@
 
 ## Description
 
-A single web page returned by `!Search` or `!Similar`.
+A single web page returned by `!Search`.
 
 ## Fields
 

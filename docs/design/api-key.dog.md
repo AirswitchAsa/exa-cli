@@ -3,7 +3,7 @@
 ## Condition
 
 - `@User` wants to store or inspect the local Exa API key used by the CLI
-- `@User` runs `exa api-key set`, `status`, or `unset`
+- `@User` runs `exa-cli api-key set`, `status`, or `unset`
 
 ## Description
 
